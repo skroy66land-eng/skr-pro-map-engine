@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en" oncontextmenu="return false;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SKR Pro V101 (Undo Fixed)</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</script>
+
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAAsTAAALEwEAmpwYAAABWWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4KPHg6eG1wbWV0YSB4bWxuczp4PSdhZG9iZTpuczptZXRhLyc+CjxyZGY6UkRGIHhtbG5zOnJkZj0naHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyc+Cgk8cmRmOkRlc2NyaXB0aW9uIHhtbG5zOmRjPSdodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyc rZGY6YWJvdXQ9JycvPgo8L3JkZjpSREY+CjwveDp4bXBtZXRhPgo8P3hwYWNrZXQgZW5kPSd3Jz8+PulYfEAAAD6SURBVHic7cExAQAAAMKg9U9tCy8gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD4Me70AAfS6mEAAAAAASUVORK5CYII=">
+
+    <style>
+        /* --- [V87 CORE STYLES - UNTOUCHED] --- */
+        body { -webkit-user-select: none; user-select: none; touch-action: none; margin: 0; padding: 0; background: #ffffff !important; overflow: hidden; font-family: 'Segoe UI', Arial, sans-serif; }
+        
+        #appHeader { position: absolute; top: 0; left: 0; right: 0; height: 75px; background: #ffffff; color: #222; z-index: 7000; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-bottom: 3px solid #FFD700; transition: background-color 0.1s; }
+        #appHeader.tap-active { background-color: #f0f0f0; } 
+        #appHeader h1 { margin: 0; font-size: 18px; font-weight: 900; }
+        #appHeader h2 { margin: 1px 0; font-size: 10px; font-weight: bold; color: #b08d57; text-transform: uppercase; }
+
+        #map { position: absolute; top: 75px; bottom: 0; right: 0; left: 0; z-index: 1; background: #ffffff !important; cursor: none !important; }
+        .svg-layer { z-index: 100; pointer-events: none !important; }
+        .canvas-text-layer { z-index: 101; opacity: 1.0; pointer-events: none !important; }
+        .overlay-map-layer { z-index: 500; pointer-events: none !important; opacity: 0.8; }
+
+        .leaflet-tooltip { background-color: #ffffff !important; border: 1.5px solid #FFD700 !important; border-radius: 4px !important; color: #000000 !important; font-weight: 900 !important; font-size: 10px !important; padding: 0px 3px !important; box-shadow: 0 0 6px rgba(255, 215, 0, 0.9) !important; white-space: nowrap; pointer-events: none; line-height: 1.0; z-index: 8000; }
+
+        .leaflet-div-icon.rotated-label-container { background: transparent; border: none; }
+        .rotated-label { 
+            background: #fff9c4; border: 1.2px solid #FFD700; color: black; font-weight: 900; 
+            padding: 0px 2px; border-radius: 4px; white-space: nowrap; text-align: center; 
+            box-shadow: 1px 1px 0px rgba(0,0,0,0.2); font-size: var(--text-size); line-height: 1.0;
+            transform-origin: center center; position: absolute; top:0; left:0; will-change: transform; 
+        }
+
+        #topBar { position: absolute; top: 85px; left: 10px; right: 10px; display: flex; justify-content: space-between; z-index: 6000; pointer-events: none; }
+        .skr-badge { background: #001f3f; color: #FFD700; padding: 10px 15px; border-radius: 10px; border: 1px solid #FFD700; font-size: 11px; font-weight: bold; cursor: pointer; pointer-events: auto; }
+        .btn-menu { background: #FFD700; color: #000; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; box-shadow: 0 2px 5px black; pointer-events: auto; }
+        
+        #leftControls { position: absolute; bottom: 20px; left: 10px; display: flex; gap: 12px; z-index: 6000; }
+        .circle-btn { width: 48px; height: 48px; border-radius: 50%; border: none; background: white; color: #333; font-size: 22px; box-shadow: 0 2px 10px black; display: flex; justify-content: center; align-items: center; }
+        
+        #rightPanel { position: absolute; bottom: 20px; right: 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 6000; }
+        #findCursorBtn { width: 45px; height: 45px; background: #001f3f; border: 2px solid #FFD700; border-radius: 50%; color: white; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px black; cursor: pointer; }
+        .control-strip { background: rgba(255,255,255,0.98); padding: 5px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 10px black; width: 55px; align-items: center; }
+        .mode-btn { width: 45px; height: 40px; border: 1px solid #ccc; background: white; border-radius: 6px; font-size: 10px; font-weight: bold; display: flex; flex-direction: column; justify-content: center; align-items: center; line-height: 1.1; }
+        .mode-active { background: #001f3f; color: #FFD700; border: 2px solid #FFD700; }
+        
+        #pageNav { position: absolute; bottom: 25px; left: 140px; background: #001f3f; color: #FFD700; padding: 4px 8px; border-radius: 15px; border: 1.5px solid #FFD700; display: none; gap: 8px; align-items: center; z-index: 6000; box-shadow: 0 4px 10px black; font-size: 10px; height: 30px; }
+        .nav-arrow { font-size: 14px; cursor: pointer; font-weight: bold; padding: 0 5px; }
+        #pageInfo { font-size: 10px; font-weight: bold; white-space: nowrap; }
+
+        #overlayControls { 
+            position: absolute; top: 135px; left: 10px; z-index: 9000; 
+            display: none; background: rgba(255,255,255,0.98); 
+            padding: 12px; border-radius: 12px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.6); 
+            flex-direction: column; gap: 10px; width: 220px; 
+            border: 2px solid #FFD700; 
+            transition: all 0.3s ease; 
+        }
+        
+        #minimizedIcon {
+            position: absolute; top: 135px; left: 10px; z-index: 20000; 
+            width: 45px; height: 45px; background: #FFD700; border: 2px solid #001f3f; 
+            border-radius: 10px; display: none; justify-content: center; align-items: center; 
+            font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.6); 
+            pointer-events: auto; 
+        }
+
+        .overlay-header { font-size: 12px; font-weight: 900; color: #001f3f; display: flex; justify-content: space-between; align-items: center; }
+        .ov-btn-row { display: flex; gap: 8px; justify-content: space-between; }
+        .ov-btn { flex: 1; padding: 10px; font-size: 14px; font-weight: bold; background: #f0f0f0; color: #333; border: 1px solid #999; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); user-select: none; }
+        .ov-btn:active { transform: scale(0.95); background: #FFD700; }
+        .lock-btn { background: #CCFF00; color: black; border: 2px solid black; }
+        .unlock-btn { background: #ff4444; color: white; border: 2px solid black; }
+        input[type=range] { width: 100%; accent-color: #001f3f; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 20000; justify-content: center; align-items: center; }
+        .modal-box { background: white; width: 92%; max-width: 350px; padding: 25px; border-radius: 24px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.8); box-sizing: border-box; }
+        #calibVal { width: 100%; padding: 14px; font-size: 24px; text-align: center; border: 2.5px solid #FFD700; border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; }
+        .map-item { padding: 20px; background: #f8f9fa; border: 1.5px solid #eaeaea; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: #001f3f; margin-bottom: 15px; }
+
+        #exportModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 9999; flex-direction: column; overflow: hidden; }
+        .report-header { min-height: 28%; background: #0a0a0a; color: #FFD700; display: flex; flex-direction: column; justify-content: center; align-items: center; border-bottom: 4px solid #FFD700; position: relative; padding: 15px 0; box-sizing: border-box; }
+        .report-title { font-size: 14px; font-weight: 900; letter-spacing: 0.8px; margin-bottom: 12px; text-transform: uppercase; outline: none; padding-top: 10px; }
+        .report-fields { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 96%; }
+        .report-fields input { height: 32px; line-height: 32px; padding: 0 5px; font-size: 11px; border: 1.2px solid #444; border-radius: 6px; background: #fff; color: #000; font-weight: bold; width: 100%; box-sizing: border-box; text-align: center; }
+        .report-map-segment { flex-grow: 1; background: #ffffff; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; border-bottom: 2.5px solid #FFD700; }
+        #captureImg { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .report-north-arrow { position: absolute; top: 15px; right: 15px; width: 40px; height: 60px; z-index: 100; text-align: center; display:flex; flex-direction:column; align-items:center; pointer-events: none; }
+        .report-footer { height: 12.5%; background: #000000; color: #FFD700; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 5px; box-sizing: border-box; outline: none; }
+        .report-footer h3 { margin: 0; font-size: 18px; font-weight: 900; letter-spacing: 0.5px; color: #FFD700; }
+        .report-footer p { margin: 2px 0; font-size: 11px; color: #ffffff; font-weight: 600; }
+        .download-bar { width: 100%; text-align: center; padding: 15px 0; background: white; }
+        .btn-download { background: #FFD700; color: #000; border: none; padding: 13px 45px; border-radius: 50px; font-weight: 900; font-size: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        
+        #loader { position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:#001f3f; color:#FFD700; padding:20px; border-radius:12px; z-index: 25000; display:none; border:2px solid #FFD700; font-weight: bold; text-align: center; }
+        
+        #magicCursor { position: absolute; top: 50%; left: 50%; width: 60px; height: 120px; z-index: 5000; display: none; touch-action: none; pointer-events: none; }
+        .cursor-graphic { position: absolute; top: 0; left: 5px; width: 50px; height: 50px; z-index: 5002; filter: drop-shadow(0px 3px 5px rgba(0,0,0,0.4)); }
+        .cursor-lens-circle { fill: rgba(255,255,255,0.01); stroke: #FFD700; stroke-width: 5px; }
+        .ch-black { stroke: black; stroke-width: 3.5px; }
+        .ch-red { stroke: red; stroke-width: 1.3px; }
+        .ch-green { stroke: #CCFF00; stroke-width: 0.6px; }
+        .lens-dot { fill: white; }
+        .cursor-stem { width: 2px; height: 26px; background: #FFD700; position: absolute; top: 48px; left: 29px; z-index: 5001; }
+        .cursor-handle { width: 52px; height: 52px; background: #FFD700; border: 3.5px solid white; border-radius: 50%; position: absolute; bottom: 0; left: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; pointer-events: auto; z-index: 5003; }
+        .plus-icon { font-size: 26px; font-weight: 900; color: #001f3f; }
+        .cursor-cut-btn { position: absolute; top: 25px; right: -28px; width: 32px; height: 32px; background: white; border: 2.2px solid #d32f2f; border-radius: 50%; color: #d32f2f; font-size: 16px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 8px black; pointer-events: auto; z-index: 5005; }
+        
+        .cursor-magnet-btn { position: absolute; top: 25px; left: -28px; width: 32px; height: 32px; background: white; border: 2.2px solid #25D366; border-radius: 50%; color: #25D366; font-size: 16px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 8px black; pointer-events: auto; z-index: 5005; }
+        .mag-off { border-color: #d32f2f !important; color: #d32f2f !important; background: #ffe6e6 !important; }
+
+        /* [V101 SECURITY STYLES - SYNC SYSTEM REPAIRED] */
+        #licenseOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #001f3f; z-index: 35000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #FFD700; text-align: center; }
+        .lic-box { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; border: 2px solid #FFD700; width: 85%; max-width: 350px; backdrop-filter: blur(10px); }
+        .lic-input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; text-align: center; font-weight: bold; font-size: 16px; color:#000; }
+        .lic-btn { width: 100%; padding: 12px; background: #FFD700; color: #000; border: none; border-radius: 8px; font-weight: 900; cursor: pointer; margin-top: 10px; font-size: 14px; }
+        .hidden { display: none !important; }
+        #validityPeriod { width: 90%; padding: 10px; border-radius: 8px; font-weight: bold; margin-bottom: 10px; color:#000; }
+        #toastBox { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 50px; padding: 12px; position: fixed; z-index: 50000; left: 50%; bottom: 80px; transform: translateX(-50%); font-size: 14px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 2px solid #FFD700; }
+        #toastBox.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 80px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 80px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
+        :root { --text-size: 10px; --marker-radius: 2px; --line-wt: 1.0px; } 
+
+        @media screen and (min-width: 800px) {
+            #magicCursor { width: 150px !important; height: 300px !important; transform: none !important; }
+            .cursor-graphic { width: 130px !important; height: 130px !important; left: 10px !important; }
+            .cursor-lens-circle { stroke-width: 12px !important; }
+            .ch-black { stroke-width: 9px !important; }
+            .ch-red { stroke-width: 4px !important; }
+            .ch-green { stroke-width: 2px !important; }
+            .cursor-stem { width: 5px !important; height: 70px !important; top: 120px !important; left: 72px !important; }
+            .cursor-handle { width: 130px !important; height: 130px !important; left: 10px !important; border-width: 8px !important; bottom: 0 !important; }
+            .plus-icon { font-size: 60px !important; }
+            .cursor-cut-btn { width: 80px !important; height: 80px !important; font-size: 40px !important; top: 60px !important; right: -70px !important; }
+            .cursor-magnet-btn { width: 80px !important; height: 80px !important; font-size: 40px !important; top: 60px !important; left: -70px !important; }
+            
+            #appHeader { height: 180px !important; }
+            #appHeader h1 { font-size: 45px !important; }
+            #appHeader h2 { font-size: 24px !important; }
+            #topBar { top: 200px !important; } 
+            #map { top: 180px !important; }
+            .circle-btn { width: 100px !important; height: 100px !important; font-size: 45px !important; margin: 20px !important; }
+            .mode-btn { width: 100px !important; height: 90px !important; font-size: 24px !important; margin-bottom: 20px !important; }
+            #findCursorBtn { width: 90px !important; height: 90px !important; font-size: 40px !important; }
+            .control-strip { width: 120px !important; padding: 20px !important; }
+            .skr-badge, .btn-menu { font-size: 26px !important; padding: 20px 40px !important; }
+            #overlayControls { width: 320px !important; font-size: 16px !important; padding: 25px !important; top: 220px !important; }
+            #minimizedIcon { top: 220px !important; left: 10px !important; }
+            .ov-btn { font-size: 18px !important; padding: 15px !important; }
+            #pageNav { height: 80px !important; font-size: 35px !important; padding: 20px 40px !important; left: 50% !important; transform: translateX(-50%) !important; bottom: 50px !important; gap: 30px !important; align-items: center !important; }
+            .nav-arrow { font-size: 45px !important; cursor: pointer; }
+            #pageInfo { font-size: 30px !important; }
+            .modal-box { max-width: 1000px !important; width: 80% !important; padding: 50px !important; }
+            .map-item { padding: 35px !important; font-size: 30px !important; margin-bottom: 25px !important; }
+            #savedMapContainer { max-height: 800px !important; }
+            .modal-box button { padding: 30px !important; font-size: 30px !important; margin-top: 30px !important; }
+            .control-strip > div:first-child { width: 80px !important; height: 80px !important; border: 4px solid white !important; }
+            #colorInput { width: 200% !important; height: 200% !important; transform: scale(3.5) !important; margin: -30% !important; }
+            :root { --text-size: 26px !important; --marker-radius: 8px !important; --line-wt: 2px !important; }
+            #exportModal { justify-content: flex-start !important; }
+            .report-header { min-height: auto !important; padding: 30px 0 !important; flex: 0 0 auto !important; }
+            .report-fields { gap: 15px !important; }
+            .report-fields input { height: auto !important; line-height: normal !important; padding: 12px 5px !important; font-size: 16px !important; } 
+            .report-title { font-size: 20px !important; margin-bottom: 20px !important; }
+            .report-footer { height: auto !important; padding: 20px 0 !important; flex: 0 0 auto !important; }
+            .report-map-segment { flex-grow: 1 !important; height: auto !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="licenseOverlay">
+    <div class="lic-box" id="loginBox">
+        <h2 style="font-weight:900;">SKR GEO-LEGAL</h2>
+        <p>SECURE LOGIN</p>
+        <input type="number" id="userMobile" class="lic-input" placeholder="Enter Mobile Number">
+        <button class="lic-btn" onclick="checkUser()">LOGIN</button>
+    </div>
+    <div class="lic-box hidden" id="otpBox">
+        <h3 style="color:#ff5252;">ACTIVATION REQUIRED</h3>
+        <p>This device needs a license.</p>
+        <p>Device ID: <span id="deviceIdDisplay" style="color:#FFD700; font-weight:900; font-size:18px;"></span></p>
+        <p style="color:#fff; font-size:12px;">User: <span id="currentUserDisplay"></span></p>
+        <button class="lic-btn" style="background:#25D366; color:white;" onclick="prepareRequest(1)">SELECT: 1 MONTH</button>
+        <button class="lic-btn" style="background:#ff9800; color:white;" onclick="prepareRequest(3)">SELECT: 3 MONTHS</button>
+        <button class="lic-btn" style="background:#673ab7; color:white;" onclick="prepareRequest(12)">SELECT: 1 YEAR</button>
+        <div id="commChoiceBox" class="hidden" style="margin-top:10px; border-top:1px dashed #fff; padding-top:10px;">
+            <p id="selectedPlanText" style="color:#FFD700; font-size:14px; font-weight:bold;"></p>
+            <p style="color:white; font-size:11px; margin-bottom:5px;">Send Request via:</p>
+            <button class="lic-btn" style="background:#25D366; width:48%; display:inline-block;" onclick="sendRequest('wa')">WhatsApp 💬</button>
+            <button class="lic-btn" style="background:#008CBA; width:48%; display:inline-block;" onclick="sendRequest('sms')">Message ✉️</button>
+        </div>
+        <input type="password" id="otpInput" class="lic-input" placeholder="Enter OTP" style="margin-top:15px;">
+        <button class="lic-btn" onclick="verifyOTP()">ACTIVATE NOW</button>
+        <button onclick="changeUser()" style="background:transparent; border:none; color:#fff; font-size:11px; margin-top:10px; cursor:pointer;">🔄 Wrong Number / Admin Login</button>
+    </div>
+    <div class="lic-box hidden" id="adminPanel">
+        <h3 style="color:#00ff00;">MASTER ADMIN</h3>
+        <p>Generate OTP for Client</p>
+        <select id="validityPeriod">
+            <option value="1">Valid: 1 Month (30 Days)</option>
+            <option value="3">Valid: 3 Months (90 Days)</option>
+            <option value="12">Valid: 1 Year (365 Days)</option>
+        </select>
+        <input type="number" id="clientMobileInAdmin" class="lic-input" placeholder="Client Mobile Number">
+        <input type="text" id="clientDeviceId" class="lic-input" placeholder="Client Device ID">
+        <button class="lic-btn" onclick="generateClientOTP()">GENERATE CODE</button>
+        <div id="generatedCodeDisplay" style="font-size:24px; margin-top:10px; color:#00ff00; font-weight:bold;"></div>
+        <div id="adminCommOptions" class="hidden" style="margin-top:15px; border-top:1px dashed #fff; padding-top:10px;">
+            <p style="color:#fff; font-size:11px;">Send OTP to Client via:</p>
+            <button class="lic-btn" style="background:#25D366; width:48%; display:inline-block;" onclick="sendOtpToClient('wa')">WhatsApp 💬</button>
+            <button class="lic-btn" style="background:#008CBA; width:48%; display:inline-block;" onclick="sendOtpToClient('sms')">Message ✉️</button>
+        </div>
+        <button class="lic-btn" style="background:#d32f2f; margin-top:20px; border:2px solid #b71c1c;" onclick="logoutMaster()">🔒 LOGOUT & LOCK</button>
+        <button class="lic-btn" style="background:#555; margin-top:10px;" onclick="closeAdmin()">CLOSE</button>
+    </div>
+</div>
+
+<div id="toastBox"></div>
+
+<div id="appHeader" onclick="handleHeaderTap()">
+    <h1>SKR GEO-LEGAL ASSOCIATES</h1>
+    <h2>Smart Solutions & Digital Documentation</h2>
+</div>
+
+<div id="loader">Loading Engine...<br><small>V101 Undo Fix</small></div>
+<div id="map"></div>
+<div id="minimizedIcon" onclick="restoreOverlayPanel()">🛠️</div>
+
+<div id="overlayControls">
+    <div class="overlay-header">
+        <span>LAYER 2 TOOLS</span>
+        <button onclick="minimizeOverlayPanel()" style="background:#333; color:white; border:none; border-radius:4px; font-weight:bold; width:20px;">_</button>
+    </div>
+    <div id="adjustControls">
+        <label style="font-size:10px;">Transparency</label>
+        <input type="range" id="overlayOpacity" min="0" max="1" step="0.1" value="0.8" oninput="updateOverlayStyle()">
+        <div class="ov-btn-row" style="margin-top:5px;">
+            <button class="ov-btn" onclick="recolorOverlay('red')" style="background:#ffcccc; color:darkred;">🔴 Red</button>
+            <button class="ov-btn" onclick="recolorOverlay('blue')" style="background:#ccccff; color:darkblue;">🔵 Blue</button>
+            <button class="ov-btn" onclick="recolorOverlay('black')" style="background:#ddd; color:black;">⚫ Black</button>
+        </div>
+        <div style="border-top:1px solid #ccc; margin:8px 0;"></div>
+        <div class="overlay-header">MANUAL ALIGNMENT</div>
+        <div class="ov-btn-row">
+            <button class="ov-btn" onmousedown="startHold(moveOverlay, 'up')" ontouchstart="startHold(moveOverlay, 'up')" onmouseup="stopHold()" ontouchend="stopHold()" onmouseleave="stopHold()">⬆️</button>
+        </div>
+        <div class="ov-btn-row">
+            <button class="ov-btn" onmousedown="startHold(moveOverlay, 'left')" ontouchstart="startHold(moveOverlay, 'left')" onmouseup="stopHold()" ontouchend="stopHold()" onmouseleave="stopHold()">⬅️</button>
+            <button class="ov-btn" onmousedown="startHold(moveOverlay, 'down')" ontouchstart="startHold(moveOverlay, 'down')" onmouseup="stopHold()" ontouchend="stopHold()" onmouseleave="stopHold()">⬇️</button>
+            <button class="ov-btn" onmousedown="startHold(moveOverlay, 'right')" ontouchstart="startHold(moveOverlay, 'right')" onmouseup="stopHold()" ontouchend="stopHold()" onmouseleave="stopHold()">➡️</button>
+        </div>
+        <div class="ov-btn-row" style="margin-top:5px;">
+            <button class="ov-btn" onmousedown="startHold(scaleOverlay, 1.002)" ontouchstart="startHold(scaleOverlay, 1.002)" onmouseup="stopHold()" ontouchend="stopHold()" onmouseleave="stopHold()">➕ Expand</button>
+            <button class="ov-btn" onmousedown="startHold(scaleOverlay, 0.998)" ontouchstart="startHold(scaleOverlay, 0.998)" onmouseup="stopHold()" ontouchend="stopHold()" onmouseleave="stopHold()">➖ Shrink</button>
+        </div>
+    </div>
+    <div style="margin-top:8px; border-top:1px solid #ccc; padding-top:8px; display:flex; gap:5px;">
+        <button id="lockToggleBtn" class="ov-btn lock-btn" style="flex:2;" onclick="toggleOverlayLock()">🔒 LOCK</button>
+        <button class="ov-btn" style="flex:1; background:#ffcccc; color:red; border:2px solid red;" onclick="removeOverlay()">🗑️</button>
+    </div>
+</div>
+
+<div id="topBar">
+    <div class="skr-badge" onclick="openMapList('base')">📂 MY SAVED MAPS</div>
+    <div style="display:flex; gap:8px;">
+        <button class="btn-menu" onclick="document.getElementById('newPdfInput').click()">➕ NEW</button>
+        <button class="btn-menu" onclick="openMapList('overlay')" style="background:#e67e22; color:white;">➕ ADD OVERLAY</button>
+        <button class="btn-menu" onclick="openExportModal()" style="background:#001f3f; color:#FFD700;">📸 SHARE</button>
+    </div>
+    <input type="file" id="newPdfInput" accept="application/pdf,image/*" style="display:none" onchange="handleNewFile(event)">
+    <input type="file" id="overlayPdfInput" accept="application/pdf,image/*" style="display:none" onchange="handleOverlayFile(event)">
+</div>
+
+<div id="leftControls">
+    <button class="circle-btn" id="btnUndo" onclick="undoAction()">↩️</button>
+    <button class="circle-btn" id="btnRedo" onclick="redoAction()">↪️</button>
+</div>
+
+<div id="pageNav">
+    <div class="nav-arrow" onclick="changePage(-1)">&#9664;</div>
+    <div id="pageInfo">1 / 1</div>
+    <div class="nav-arrow" onclick="changePage(1)">&#9654;</div>
+</div>
+
+<div id="rightPanel">
+    <div id="findCursorBtn" onclick="resetCursor()">🎯</div>
+    <div class="control-strip">
+        <div style="width:38px;height:38px;border-radius:50%;overflow:hidden;border:2px solid white;margin-bottom:5px;">
+            <input type="color" id="colorInput" value="#CCFF00" onchange="updateColor()" style="width:150%;height:150%;margin:-25%;border:none;">
+        </div>
+        <button class="mode-btn mode-active" id="btnScale" onclick="switchMode('scale')">📏<br>Scale</button>
+        <button class="mode-btn" id="btnDist" onclick="switchMode('dist')">📐<br>Dist</button>
+        <button class="mode-btn" id="btnArea" onclick="switchMode('area')">⬜<br>Area</button>
+        <button class="mode-btn" onclick="sequentialDelete()" style="color:red; font-size:20px;">🗑️</button>
+    </div>
+</div>
+
+<div id="magicCursor">
+    <svg class="cursor-graphic" viewBox="0 0 50 50">
+        <circle cx="25" cy="25" r="22" class="cursor-lens-circle"></circle>
+        <line x1="3" y1="25" x2="16" y2="25" class="ch-black"></line>
+        <line x1="34" y1="25" x2="47" y2="25" class="ch-black"></line>
+        <line x1="3" y1="25" x2="16" y2="25" class="ch-green"></line>
+        <line x1="34" y1="25" x2="47" y2="25" class="ch-green"></line>
+        <line x1="16" y1="25" x2="34" y2="25" class="ch-red"></line>
+        <line x1="25" y1="3" x2="25" y2="16" class="ch-black"></line>
+        <line x1="25" y1="34" x2="25" y2="47" class="ch-black"></line>
+        <line x1="25" y1="3" x2="25" y2="16" class="ch-green"></line>
+        <line x1="25" y1="34" x2="25" y2="47" class="ch-green"></line>
+        <line x1="25" y1="16" x2="25" y2="34" class="ch-red"></line>
+        <circle cx="25" cy="25" r="1.5" class="lens-dot"></circle>
+    </svg>
+    <div class="cursor-stem"></div>
+    <div class="cursor-cut-btn" onclick="finishShape()">✂️</div>
+    <div class="cursor-magnet-btn" id="magBtn" onclick="toggleMagnet()">🧲</div>
+    <div class="cursor-handle" id="handleBtn"><span class="plus-icon">+</span></div>
+</div>
+
+<div id="resultBox" class="hidden">0.00</div>
+
+<div id="mapListModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 id="mapListTitle">MY SAVED MAPS</h3>
+        <div id="savedMapContainer" class="map-list" style="max-height:400px; overflow-y:auto; margin:20px 0;"></div>
+        <button onclick="closeModal('mapListModal')" style="background:#555; color:white; width:100%; padding:15px; border:none; border-radius:12px; font-weight:bold;">CLOSE</button>
+    </div>
+</div>
+
+<div id="calibModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3>SET SCALE</h3>
+        <p style="font-size:11px; color:#666; margin-bottom:5px;">मान भरें (Enter Value)</p>
+        <input type="number" id="calibVal" placeholder="Value">
+        <select id="calibUnit" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; border:1.5px solid #ccc;">
+            <option value="ft" selected>Feet (फीट)</option>
+            <option value="links">Links (कड़ी)</option>
+            <option value="m">Meter (मीटर)</option>
+        </select>
+        <button onclick="applyCalibration()" style="background:#001f3f; color:#FFD700; width:100%; padding:18px; border-radius:10px; font-weight:bold; border:none;">CONFIRM SCALE</button>
+    </div>
+</div>
+
+<div id="exportModal">
+    <div class="report-header">
+        <div class="report-title" contenteditable="true">DIGITAL NAZARI NAKSHA REPORT (NTS)</div>
+        <div class="report-fields">
+            <input type="text" id="exDistrict" placeholder="जिला">
+            <input type="text" id="exAnchal" placeholder="अंचल">
+            <input type="text" id="exMauza" placeholder="राजस्व मौजा">
+            <input type="text" id="exThanaNo" placeholder="थाना नं">
+            <input type="text" id="exKhata" placeholder="खाता संख्या">
+            <input type="text" id="exKhesra" placeholder="खेसरा संख्या">
+            <input type="text" id="exArea" placeholder="रकबा">
+            <input type="text" id="exSheet" placeholder="मानचित्र उपखंड">
+            <input type="text" id="exScale" placeholder="मानचित्र पैमाना">
+            <input type="text" id="exRayyat" placeholder="रैयत का नाम (Owner)" style="grid-column: span 3;">
+        </div>
+        <button onclick="closeExport()" style="position:absolute; top:8px; right:8px; background:red; color:white; border:none; border-radius:4px; font-size:11px;">X</button>
+    </div>
+    <div id="captureContainer" class="report-map-segment">
+        <div class="report-north-arrow">
+            <span style="font-size:18px; font-weight:900; color:black; margin-bottom:-5px;">N</span>
+            <svg width="25" height="40" viewBox="0 0 100 150"><path d="M50 10 L90 130 L50 100 L10 130 Z" fill="black"/></svg>
+        </div>
+        <img id="captureImg" src="">
+    </div>
+    <div class="report-footer" contenteditable="true">
+        <h3>SKR GEO-LEGAL ASSOCIATES</h3>
+        <p>Surveyor: S.K. Roy (S.K.R.) | Ph: +91 62002 63472</p>
+        <p style="color:#FFD700; font-size:10px;">MSME REGD. UDYAM-BR-30-0077516 | ISO 9001:2015</p>
+    </div>
+    <div id="downloadAction" class="download-bar">
+        <button class="btn-download" onclick="downloadFinalReport()">⬇️ DOWNLOAD REPORT</button>
+    </div>
+</div>
+
+<script>
+    /* --- [V101 ADVANCED SECURITY - UNIQUE MULTIPLIERS] --- */
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJ-MQyHBEukx6t03zFAeApGKpB7CbIDwU64kXeDh5R1ZJ6MquuavVqwY2hW9b5oGbv/exec";
+    const APP_ID = "SKR_PRO_MAP_V101"; 
+    const MASTER_NUMBER = "6200263472"; 
+    const MASTER_PIN = "30112011"; 
+
+    function getHPID() {
+        const n = window.navigator; const s = window.screen;
+        let str = n.userAgent + n.language + s.colorDepth + s.width + n.height + n.hardwareConcurrency;
+        let hash = 0; for (let i = 0; i < str.length; i++) { hash = (hash << 5) - hash + str.charCodeAt(i); hash |= 0; }
+        return "HW-PRO-" + Math.abs(hash);
+    }
+    const hpid = getHPID();
+
+    let deviceId = localStorage.getItem('skr_pro_device_id');
+    if(!deviceId) { 
+        deviceId = Math.floor(100000 + Math.random() * 900000).toString(); 
+        localStorage.setItem('skr_pro_device_id', deviceId); 
+    }
+
+    // UNIQUE MULTIPLIERS FOR MAP APP (Different from Calculator)
+    function getSmartCode(dId, months) {
+        let d = new Date(); let day = d.getDate(); let m = d.getMonth() + 1; let y = d.getFullYear();
+        // New multipliers: 814, 418, 7 | 357, 159, 22 | 258, 147, 40
+        let f = (months == 1) ? (day*814 + m*418 + y*7) : (months == 3) ? (day*357 + m*159 + y*22) : (day*258 + m*147 + y*40);
+        let base = (months == 1) ? 24680 : (months == 3) ? 13579 : 88888;
+        return (parseInt(dId) + base + f).toString();
+    }
+
+    async function syncToCloud(exp, mob) {
+        try { fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ aid: APP_ID, hpid: hpid, exp: exp, mob: mob, did: deviceId }) }); } catch(e){}
+    }
+
+    async function recoverFromCloud() {
+        try {
+            const response = await fetch(`${SCRIPT_URL}?hpid=${hpid}&aid=${APP_ID}`);
+            const text = await response.text();
+            if (text === "not_found") return null;
+            return JSON.parse(text);
+        } catch(e) { return null; }
+    }
+
+    let currentUser = localStorage.getItem('skr_user_mobile');
+
+    async function initSecurity() {
+        currentUser = localStorage.getItem('skr_user_mobile');
+        document.getElementById('deviceIdDisplay').innerText = deviceId;
+        
+        if (currentUser === MASTER_NUMBER) { unlockApp(true); return; }
+
+        let expiry = localStorage.getItem('skr_license_expiry');
+        
+        // AUTO-RECOVERY LOGIC (BACKGROUND SYNC)
+        if (!expiry) {
+            let rec = await recoverFromCloud();
+            if (rec && parseInt(rec.exp) > Date.now()) {
+                localStorage.setItem('skr_license_expiry', rec.exp);
+                localStorage.setItem('skr_user_mobile', rec.mob);
+                localStorage.setItem('skr_pro_device_id', rec.did); 
+                deviceId = rec.did; currentUser = rec.mob; expiry = rec.exp;
+                showToast("✅ लाइसेंस बहाल (Recovered)");
+                if (currentUser === MASTER_NUMBER) { unlockApp(true); return; }
+            }
+        }
+
+        if (expiry && parseInt(expiry) > Date.now()) {
+            unlockApp();
+            let d = new Date(parseInt(expiry));
+            showToast("⌛ एक्सपायरी: " + d.toLocaleDateString('hi-IN'));
+        } else {
+            document.getElementById('licenseOverlay').style.display = 'flex';
+        }
+    }
+
+    function checkUser() {
+        let m = document.getElementById('userMobile').value;
+        if (!m || m.length < 10) return;
+        if (m === MASTER_NUMBER) {
+            let p = prompt("🔐 पिन:");
+            if (p === MASTER_PIN) { localStorage.setItem('skr_user_mobile', m); currentUser = m; unlockApp(true); }
+        } else {
+            localStorage.setItem('skr_user_mobile', m); currentUser = m;
+            document.getElementById('currentUserDisplay').innerText = m;
+            document.getElementById('loginBox').classList.add('hidden');
+            document.getElementById('otpBox').classList.remove('hidden');
+        }
+    }
+
+    function verifyOTP() { 
+        let input = document.getElementById('otpInput').value; 
+        let c1 = getSmartCode(deviceId, 1), c3 = getSmartCode(deviceId, 3), c12 = getSmartCode(deviceId, 12); 
+        let exp = 0;
+        if (input === c1) exp = Date.now() + 30*24*60*60*1000; 
+        else if (input === c3) exp = Date.now() + 90*24*60*60*1000; 
+        else if (input === c12) exp = Date.now() + 365*24*60*60*1000; 
+        else { alert("❌ गलत कोड!"); return; }
+        
+        localStorage.setItem('skr_license_expiry', exp);
+        syncToCloud(exp, currentUser); 
+        unlockApp(); 
+    }
+
+    function unlockApp(isMaster = false) { 
+        document.getElementById('licenseOverlay').style.display = 'none'; 
+        if(isMaster) {
+            document.getElementById('loginBox').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            showToast("👑 MASTER ADMIN"); 
+        }
+    }
+
+    function logoutMaster() { if(confirm("Logout & Lock?")) { localStorage.clear(); location.reload(); } }
+    function changeUser() { localStorage.removeItem('skr_user_mobile'); location.reload(); }
+    function showToast(m) { let x = document.getElementById("toastBox"); x.innerText = m; x.className = "show"; setTimeout(() => x.className = "", 3000); }
+
+    let selectedDuration = 1;
+    function prepareRequest(months) { 
+        selectedDuration = months; 
+        document.getElementById('selectedPlanText').innerText = "Selected: " + (months==12?"1 Year":months+" Month"); 
+        document.getElementById('commChoiceBox').classList.remove('hidden'); 
+    }
+
+    function sendRequest(method) {
+        let plan = selectedDuration == 12 ? "1 Year" : selectedDuration + " Month";
+        let msg = `🚩 *एसकेआर जिओ लीगल एसोसिएट्स* 🚩\n\nविषय: *सॉफ्टवेयर एक्टिवेशन हेतु कानूनी अनुरोध*\n\nश्रीमान, मैं अपनी स्वेच्छा से आपकी डिजिटल सेवा लेना चाहता हूँ। कृपया मेरे डिवाइस को सक्रिय करें।\n\n📱 मोबाइल: ${currentUser}\n🆔 डिवाइस आईडी: ${deviceId}\n🔗 फिंगरप्रिंट: ${hpid}\n📅 प्लान: ${plan}\n\nधन्यवाद।`;
+        let url = method === 'wa' ? `https://wa.me/91${MASTER_NUMBER}?text=${encodeURIComponent(msg)}` : `sms:${MASTER_NUMBER}?body=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+    }
+
+    function sendOtpToClient(method) {
+        let cmob = document.getElementById('clientMobileInAdmin').value;
+        let cotp = document.getElementById('generatedCodeDisplay').innerText;
+        let cdid = document.getElementById('clientDeviceId').value;
+        let cexp = document.getElementById('validityPeriod').value;
+        let days = (cexp == "12") ? 365 : (parseInt(cexp) * 30);
+        let d = new Date(Date.now() + (days * 24 * 60 * 60 * 1000));
+        let msg = `🎊 *बधाई हो! आपकी सेवा सक्रिय है* 🎊\n\n*SKR GEO-LEGAL ASSOCIATES*\nआपका सॉफ्टवेयर सफलतापूर्वक अपडेट कर दिया गया है।\n\n🔑 एक्टिवेशन कोड: *${cotp}*\n🆔 डिवाइस आईडी: ${cdid}\n⌛ आखरी तिथि: ${d.toLocaleDateString('hi-IN')}\n\nहमारी सेवा चुनने के लिए धन्यवाद। शुभकामनाएँ!`;
+        let url = method === 'wa' ? `https://wa.me/91${cmob}?text=${encodeURIComponent(msg)}` : `sms:${cmob}?body=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+    }
+
+    function generateClientOTP() { 
+        let cid = document.getElementById('clientDeviceId').value; 
+        let per = document.getElementById('validityPeriod').value; 
+        if(cid) { 
+            document.getElementById('generatedCodeDisplay').innerText = getSmartCode(cid, per); 
+            document.getElementById('adminCommOptions').classList.remove('hidden');
+        } 
+    }
+    function closeAdmin() { document.getElementById('licenseOverlay').style.display = 'none'; }
+
+    let tapCount = 0; let tapTimer = null;
+    function handleHeaderTap() { 
+        let headerEl = document.getElementById('appHeader');
+        headerEl.classList.add('tap-active');
+        setTimeout(() => headerEl.classList.remove('tap-active'), 100);
+        if(localStorage.getItem('skr_user_mobile') !== MASTER_NUMBER) return; 
+        tapCount++; clearTimeout(tapTimer); tapTimer = setTimeout(() => { tapCount = 0; }, 600); 
+        if(tapCount >= 5) { document.getElementById('licenseOverlay').style.display = 'flex'; document.getElementById('adminPanel').classList.remove('hidden'); tapCount = 0; } 
+    }
+
+    /* --- [V87 CORE SCRIPT - ABSOLUTELY UNTOUCHED] --- */
+    localforage.config({ name: 'SKR_Pro_V62_License', storeName: 'skr_data' });
+    let map, svgLayer, canvasTextLayer, overlayLayer = null, mode='scale', unit='ft', currentColor='#CCFF00';
+    let currentMapKey = null;
+    let activePoints=[], activeMarkers=[], finishedShapes=[], historyStack=[], redoStack=[], magneticPoints=[];
+    let activeLayer=L.layerGroup(), permanentLayer=L.layerGroup(), rubberLine=null;
+    let prevSvgUrl = null; let prevCanvasUrl = null; let pdfDoc = null; let currentPage = 1; let totalPages = 1; let pageData = {}; 
+    let scaleFactor = 0; 
+    let currentOverlayKey = null;
+    let isMagnetActive = true; 
+
+    map = L.map('map', { 
+        crs: L.CRS.Simple, 
+        minZoom: -5, maxZoom: 3.5, 
+        zoomSnap: 0.1,  
+        zoomDelta: 0.1, 
+        wheelPxPerZoomLevel: 120, 
+        zoomControl: false, 
+        attributionControl: false, 
+        preferCanvas: true, 
+        updateWhenIdle: true, 
+        updateWhenZooming: false, 
+        fadeAnimation: false, 
+        markerZoomAnimation: true, 
+        inertia: true, 
+        inertiaDeceleration: 3000 
+    });
+    permanentLayer.addTo(map); activeLayer.addTo(map);
+
+    if (window.matchMedia("(min-width: 800px)").matches) {
+        map.on('mousemove', function(e) {
+            let containerPoint = map.latLngToContainerPoint(e.latlng);
+            let magicCursor = document.getElementById('magicCursor');
+            let rect = magicCursor.getBoundingClientRect();
+            magicCursor.style.left = (containerPoint.x - rect.width/2) + 'px';
+            magicCursor.style.top = (containerPoint.y - rect.height/2) + 'px';
+            updateRubberLine();
+        });
+    }
+
+    let holdTimer = null;
+    function startHold(actionFunc, ...args) { if (holdTimer) return; actionFunc(...args); holdTimer = setInterval(() => { actionFunc(...args); }, 80); }
+    function stopHold() { if (holdTimer) { clearInterval(holdTimer); holdTimer = null; } }
+
+    function updateScales() {
+        let z = map.getZoom();
+        let dynScale = Math.pow(1.15, z);
+        let baseTextSize = Math.max(5, 10 * dynScale);
+        let dynamicTextSize = baseTextSize * 0.95; 
+        let labelScale = dynamicTextSize / 10; 
+        let labelPad = Math.max(0, 2 * labelScale);
+        document.querySelectorAll('.rotated-label').forEach(el => { el.style.fontSize = dynamicTextSize + 'px'; el.style.padding = `${labelPad/2}px ${labelPad}px`; el.style.borderRadius = `${labelPad}px`; });
+        
+        let baseR = 0.11; 
+        let dynamicMarkerSize = baseR * dynScale; 
+        let dynamicLineWt = Math.max(0.1, 1.8 * dynScale) * 0.42; 
+        
+        document.documentElement.style.setProperty('--text-size', dynamicTextSize + 'px');
+        document.documentElement.style.setProperty('--marker-radius', dynamicMarkerSize + 'px');
+        document.documentElement.style.setProperty('--line-wt', dynamicLineWt + 'px');
+        permanentLayer.eachLayer(grp => grp.eachLayer(layer => { 
+            if(layer instanceof L.Path) layer.setStyle({weight: dynamicLineWt}); 
+            if(layer instanceof L.CircleMarker && !layer.options.opacity) { layer.setRadius(dynamicMarkerSize); layer.setStyle({weight: 0.5}); } 
+        }));
+    }
+    map.on('zoomend', updateScales);
+
+    function refreshMagneticPoints() { magneticPoints = []; finishedShapes.forEach(shape => { shape.points.forEach(pt => magneticPoints.push(L.latLng(pt))); }); activePoints.forEach(pt => magneticPoints.push(L.latLng(pt))); }
+
+    async function renderPage(num) {
+        if(!pdfDoc) return;
+        try {
+            document.getElementById('loader').style.display='block';
+            let page = await pdfDoc.getPage(num);
+            if (prevSvgUrl) { URL.revokeObjectURL(prevSvgUrl); prevSvgUrl = null; } if (prevCanvasUrl) { prevCanvasUrl = null; } 
+            let viewport = page.getViewport({ scale: 4.5 }); 
+            let opList = await page.getOperatorList();
+            let svgGfx = new pdfjsLib.SVGGraphics(page.commonObjs, page.objs);
+            let svg = await svgGfx.getSVG(opList, viewport);
+            let style = document.createElementNS("http://www.w3.org/2000/svg", "style");
+            style.textContent = "text { display: none !important; fill: none !important; stroke: none !important; opacity: 0 !important; }";
+            svg.insertBefore(style, svg.firstChild);
+            let svgUrl = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)], {type: 'image/svg+xml;charset=utf-8'}));
+            prevSvgUrl = svgUrl; 
+            let textContent = await page.getTextContent();
+            let textViewport = page.getViewport({ scale: 4.5 });
+            let canvas = document.createElement('canvas'); canvas.width = textViewport.width; canvas.height = textViewport.height;
+            let ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
+            ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = "black"; ctx.textBaseline = "alphabetic"; 
+            const FONT_SCALE = 0.70; const WIDTH_SCALE = 0.85; 
+            textContent.items.forEach(function(item) { var tx = pdfjsLib.Util.transform(textViewport.transform, item.transform); var angle = Math.atan2(tx[1], tx[0]); var fontSize = Math.sqrt(tx[0] * tx[0] + tx[1] * tx[1]); var newFontSize = fontSize * FONT_SCALE; ctx.font = "bold " + newFontSize + "px Arial, sans-serif"; ctx.save(); ctx.translate(tx[4], tx[5]); ctx.rotate(angle); ctx.scale(WIDTH_SCALE, 1); ctx.fillText(item.str, 0, 0); ctx.restore(); });
+            let textCanvasUrl = canvas.toDataURL('image/png'); prevCanvasUrl = textCanvasUrl;
+            if(svgLayer) map.removeLayer(svgLayer); if(canvasTextLayer) map.removeLayer(canvasTextLayer);
+            svgLayer = L.imageOverlay(svgUrl, [[0,0], [viewport.height, viewport.width]], { interactive: false, className: 'svg-layer' }).addTo(map);
+            canvasTextLayer = L.imageOverlay(textCanvasUrl, [[0,0], [viewport.height, viewport.width]], { interactive: false, className: 'canvas-text-layer' }).addTo(map);
+            map.fitBounds([[0,0], [viewport.height, viewport.width]]);
+            document.getElementById('loader').style.display='none'; document.getElementById('pageInfo').innerText = `${currentPage} / ${totalPages}`;
+            document.getElementById('pageNav').style.display = totalPages > 1 ? 'flex' : 'none';
+            resetCursor(); updateScales();
+        } catch (err) { alert("Error: Text extraction failed."); document.getElementById('loader').style.display='none'; }
+    }
+
+    let overlayElement = null;
+    let isOverlayLocked = false;
+    let currentOverlayOriginalData = null; 
+
+    function restoreOverlayPanel() { document.getElementById('overlayControls').style.display = 'flex'; document.getElementById('minimizedIcon').style.display = 'none'; }
+    function minimizeOverlayPanel() { document.getElementById('overlayControls').style.display = 'none'; document.getElementById('minimizedIcon').style.display = 'flex'; }
+
+    async function openMapList(mode) {
+        let c = document.getElementById('savedMapContainer'); c.innerHTML = ""; 
+        document.getElementById('mapListTitle').innerText = (mode === 'overlay') ? "SELECT OVERLAY MAP" : "MY SAVED MAPS";
+        let modal = document.getElementById('mapListModal'); modal.style.display='flex'; modal.style.zIndex='10000';
+        let keys = await localforage.keys();
+        if(keys.length === 0) { c.innerHTML = "<p style='padding:20px; color:#999;'>No Saved Maps Found</p>"; }
+        for(let k of keys) {
+            let d = await localforage.getItem(k); if(!d || !d.name) continue;
+            let dv = document.createElement('div'); dv.className = 'map-item';
+            
+            if (mode === 'overlay') {
+                dv.innerHTML = `<span onclick="loadOverlayFromDB('${k}')" style="flex-grow:1; cursor:pointer;">📑 ${d.name} (Overlay)</span> <b onclick="event.stopPropagation(); delDB('${k}')" style="color:red; margin-left:15px; font-size:20px;">✕</b>`;
+            } else {
+                dv.innerHTML = `<span onclick="loadDB('${k}')" style="flex-grow:1; cursor:pointer;">📄 ${d.name}</span> <b onclick="event.stopPropagation(); delDB('${k}')" style="color:red; margin-left:15px; font-size:20px;">✕</b>`;
+            }
+            c.appendChild(dv);
+        }
+    }
+
+    async function handleOverlayFile(e) { 
+        if(!pdfDoc) { 
+            alert("Overlay Failed: Error: Set map center and zoom first."); 
+            e.target.value = ''; 
+            return; 
+        }
+        let f = e.target.files[0]; 
+        if(!f) return; 
+        currentOverlayKey = null; 
+        processOverlay(f, 'file'); 
+    }
+    
+    async function loadOverlayFromDB(k) { 
+        if(!pdfDoc) { 
+            closeModal('mapListModal');
+            alert("Overlay Failed: Error: Set map center and zoom first."); 
+            return; 
+        }
+
+        closeModal('mapListModal'); 
+        currentOverlayKey = k; 
+
+        let d = await localforage.getItem(k); if(!d) return; 
+        await processOverlay(d.pdfBlob, 'blob');
+        
+        if(d.overlayState) {
+            if(d.overlayState.bounds) overlayLayer.setBounds(d.overlayState.bounds);
+            if(d.overlayState.opacity) {
+                document.getElementById('overlayOpacity').value = d.overlayState.opacity;
+                updateOverlayStyle();
+            }
+        }
+    }
+
+    async function processOverlay(source, type) {
+        document.getElementById('loader').style.display='block';
+        
+        if(!pdfDoc && type !== 'file') {
+             document.getElementById('loader').style.display='none';
+             return; 
+        }
+
+        try {
+            let data = (type === 'file') ? await source.arrayBuffer() : await source.arrayBuffer();
+            let overlayDoc = await pdfjsLib.getDocument({ data: data }).promise;
+            let page = await overlayDoc.getPage(1);
+            let viewport = page.getViewport({ scale: 2.5 }); 
+            let canvas = document.createElement('canvas'); canvas.width = viewport.width; canvas.height = viewport.height;
+            let ctx = canvas.getContext('2d');
+            await page.render({canvasContext: ctx, viewport: viewport}).promise;
+            
+            let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            let px = imageData.data;
+            for (let i = 0; i < px.length; i += 4) {
+                let r = px[i], g = px[i+1], b = px[i+2];
+                if (r > 200 && g > 200 && b > 200) { px[i+3] = 0; } 
+                else { px[i] = 255; px[i+1] = 0; px[i+2] = 0; }
+            }
+            ctx.putImageData(imageData, 0, 0);
+            currentOverlayOriginalData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            
+            let url = canvas.toDataURL('image/png');
+            let pdfRatio = viewport.height / viewport.width;
+            
+            let mapBounds = map.getBounds();
+            let mapWidth = mapBounds.getEast() - mapBounds.getWest();
+            let targetWidth = mapWidth * 0.7; 
+            let targetHeight = targetWidth * pdfRatio; 
+            let center = mapBounds.getCenter();
+            let sw = L.latLng(center.lat - targetHeight/2, center.lng - targetWidth/2);
+            let ne = L.latLng(center.lat + targetHeight/2, center.lng + targetWidth/2);
+            
+            if(overlayLayer) map.removeLayer(overlayLayer);
+            overlayLayer = L.imageOverlay(url, [sw, ne], { className: 'overlay-map-layer', interactive: false }).addTo(map);
+            overlayElement = overlayLayer.getElement();
+            
+            if(type === 'file') {
+                 let key = 'overlay_' + Date.now();
+                 currentOverlayKey = key;
+                 let d = { id: key, name: 'Overlay ' + new Date().toLocaleTimeString(), pdfBlob: new Blob([data]) };
+                 await localforage.setItem(key, d);
+            }
+
+            restoreOverlayPanel();
+            toggleOverlayLock(false); 
+            document.getElementById('loader').style.display='none';
+        } catch(err) { 
+            if(type === 'file') alert("Overlay Failed: " + err); 
+            document.getElementById('loader').style.display='none'; 
+        }
+    }
+
+    function recolorOverlay(color) {
+        if(!overlayLayer || !currentOverlayOriginalData) return;
+        let canvas = document.createElement('canvas'); canvas.width = currentOverlayOriginalData.width; canvas.height = currentOverlayOriginalData.height;
+        let ctx = canvas.getContext('2d');
+        let newData = new ImageData(new Uint8ClampedArray(currentOverlayOriginalData.data), currentOverlayOriginalData.width, currentOverlayOriginalData.height);
+        let px = newData.data;
+        let r=0, g=0, b=0;
+        if(color === 'red') { r=255; g=0; b=0; } else if(color === 'blue') { r=0; g=0; b=255; } else if(color === 'black') { r=0; g=0; b=0; }
+        for (let i = 0; i < px.length; i += 4) { if (px[i+3] > 0) { px[i] = r; px[i+1] = g; px[i+2] = b; } }
+        ctx.putImageData(newData, 0, 0);
+        overlayLayer.setUrl(canvas.toDataURL('image/png'));
+    }
+
+    async function toggleOverlayLock(forceState) {
+        if (typeof forceState !== 'undefined') isOverlayLocked = forceState; else isOverlayLocked = !isOverlayLocked;
+        let btn = document.getElementById('lockToggleBtn');
+        if(isOverlayLocked) { 
+            minimizeOverlayPanel(); 
+            btn.innerText = "🔒 LOCKED"; 
+            btn.className = "ov-btn unlock-btn"; 
+            if(currentOverlayKey && overlayLayer) {
+                let d = await localforage.getItem(currentOverlayKey);
+                if(d) {
+                    d.overlayState = { bounds: overlayLayer.getBounds(), opacity: document.getElementById('overlayOpacity').value };
+                    await localforage.setItem(currentOverlayKey, d);
+                }
+            }
+        } 
+        else { btn.innerText = "🔓 UNLOCK"; btn.className = "ov-btn lock-btn"; }
+    }
+
+    function removeOverlay() {
+        if(overlayLayer) { map.removeLayer(overlayLayer); overlayLayer = null; }
+        minimizeOverlayPanel();
+        currentOverlayKey = null;
+        document.getElementById('minimizedIcon').style.display = 'none'; 
+    }
+
+    function updateOverlayStyle() { if(overlayElement) overlayElement.style.opacity = document.getElementById('overlayOpacity').value; }
+    
+    function moveOverlay(dir) { 
+        if(!overlayLayer) return; 
+        let b = overlayLayer.getBounds(); 
+        let deltaLat = (b.getNorth() - b.getSouth()) * 0.0003125; 
+        let deltaLng = (b.getEast() - b.getWest()) * 0.0003125; 
+        let n = b.getNorth(), s = b.getSouth(), e = b.getEast(), w = b.getWest(); 
+        if(dir === 'up') { n+=deltaLat; s+=deltaLat; } 
+        if(dir === 'down') { n-=deltaLat; s-=deltaLat; } 
+        if(dir === 'left') { e-=deltaLng; w-=deltaLng; } 
+        if(dir === 'right') { e+=deltaLng; w+=deltaLng; } 
+        overlayLayer.setBounds([[s, w], [n, e]]); 
+    }
+    
+    function scaleOverlay(factor) { if(!overlayLayer) return; let b = overlayLayer.getBounds(); let c = b.getCenter(); let n = b.getNorth(), s = b.getSouth(), e = b.getEast(), w = b.getWest(); let newN = c.lat + (n - c.lat) * factor; let newS = c.lat + (s - c.lat) * factor; let newE = c.lng + (e - c.lng) * factor; let newW = c.lng + (w - c.lng) * factor; overlayLayer.setBounds([[newS, newW], [newN, newE]]); }
+
+    function changePage(delta) { let newPage = currentPage + delta; if(newPage < 1 || newPage > totalPages) return; savePageState(currentPage); permanentLayer.clearLayers(); activeLayer.clearLayers(); finishedShapes = []; magneticPoints = []; activePoints = []; activeMarkers = []; currentPage = newPage; renderPage(currentPage); loadPageState(currentPage); }
+    function savePageState(pNum) { if(!pageData[pNum]) pageData[pNum] = {}; pageData[pNum].scaleFactor = (typeof scaleFactor !== 'undefined') ? scaleFactor : 0; pageData[pNum].unit = unit; pageData[pNum].shapes = finishedShapes.map(s => { return { points: s.points, color: s.color, mode: s.mode }; }); saveCurrentMapToDB(); }
+    function loadPageState(pNum) { let d = pageData[pNum]; if(!d) { scaleFactor = 0; unit = 'ft'; finishedShapes = []; switchMode('scale'); } else { scaleFactor = d.scaleFactor || 0; unit = d.unit || 'ft'; finishedShapes = []; (d.shapes || []).forEach(s => { drawPermanentShape(s.points, s.mode, s.color); }); if(scaleFactor > 0) switchMode('dist'); else switchMode('scale'); refreshMagneticPoints(); } }
+
+    function getLensCenterLatLng() { const lens = document.querySelector('.cursor-graphic'); const mapDiv = document.getElementById('map'); const lensRect = lens.getBoundingClientRect(); const mapRect = mapDiv.getBoundingClientRect(); const centerX = (lensRect.left + lensRect.width / 2) - mapRect.left; const centerY = (lensRect.top + lensRect.height / 2) - mapRect.top; return map.containerPointToLatLng([centerX, centerY]); }
+    function resetCursor() { document.getElementById('magicCursor').style.display='block'; cursor.style.left='calc(50% - 30px)'; cursor.style.top='calc(50% - 60px)'; updateRubberLine(); }
+    const cursor = document.getElementById('magicCursor'); const handle = document.getElementById('handleBtn'); let isDragging=false, startX, startY, initLeft, initTop, snappedPoint=null;
+    handle.addEventListener('touchstart', dragStart, {passive: false}); handle.addEventListener('mousedown', dragStart);
+    function dragStart(e) { e.preventDefault(); isDragging=false; startX = e.touches ? e.touches[0].clientX : e.clientX; startY = e.touches ? e.touches[0].clientY : e.clientY; let r = cursor.getBoundingClientRect(); initLeft=r.left; initTop=r.top; document.addEventListener('touchmove', dragMove, {passive: false}); document.addEventListener('touchend', dragEnd); }
+    
+    function dragMove(e) { 
+        let x = e.touches ? e.touches[0].clientX : e.clientX; 
+        let y = e.touches ? e.touches[0].clientY : e.clientY; 
+        if(Math.abs(x-startX)>3 || Math.abs(y-startY)>3) isDragging=true; 
+        let nL = initLeft + (x-startX); 
+        let nT = initTop + (y-startY); 
+        snappedPoint = null; 
+        
+        if(isMagnetActive) {
+            let mapRect = document.getElementById('map').getBoundingClientRect(); 
+            const lens = document.querySelector('.cursor-graphic'); 
+            const lensRect = lens.getBoundingClientRect(); 
+            const halfWidth = lensRect.width / 2; 
+            const halfHeight = lensRect.height / 2; 
+            let centerPx = { x: (nL + halfWidth) - mapRect.left, y: (nT + halfHeight) - mapRect.top }; 
+            let snapDistance = (window.innerWidth > 800) ? 20 : 15; 
+            for(let pt of magneticPoints) { 
+                let ptPx = map.latLngToContainerPoint(pt); 
+                if(Math.sqrt(Math.pow(ptPx.x-centerPx.x, 2)+Math.pow(ptPx.y-centerPx.y, 2)) < snapDistance) { 
+                    snappedPoint = pt; 
+                    nL = (ptPx.x + mapRect.left) - halfWidth; 
+                    nT = (ptPx.y + mapRect.top) - halfHeight; 
+                    break; 
+                } 
+            }
+        }
+        
+        cursor.style.left = nL + 'px'; 
+        cursor.style.top = nT + 'px'; 
+        updateRubberLine(); 
+    }
+    
+    function dragEnd() { document.removeEventListener('touchmove', dragMove); document.removeEventListener('touchend', dragEnd); if(!isDragging) addPoint(); }
+
+    function toggleMagnet() {
+        isMagnetActive = !isMagnetActive;
+        let btn = document.getElementById('magBtn');
+        if(isMagnetActive) {
+            btn.classList.remove('mag-off');
+        } else {
+            btn.classList.add('mag-off');
+        }
+    }
+
+    function addPoint() { 
+        if(!svgLayer && !canvasTextLayer) return; 
+        let latlng = snappedPoint || getLensCenterLatLng(); 
+        
+        if(mode === 'scale' && activePoints.length >= 2) return; 
+        
+        activePoints.push(latlng); 
+        historyStack.push({type: 'point', latlng: latlng, color: currentColor, mode: mode}); 
+        redoStack = []; 
+        if(!snappedPoint) magneticPoints.push(latlng); 
+        
+        let m = L.circleMarker(latlng, { color: currentColor, radius: 0.8, fillColor: 'white', fillOpacity: 1 }).addTo(activeLayer); 
+        activeMarkers.push(m); 
+        refreshMagneticPoints(); 
+        
+        if(mode === 'scale' && activePoints.length === 2) { 
+            L.polyline(activePoints, {color: currentColor, weight: 2}).addTo(activeLayer); 
+            setTimeout(() => { document.getElementById('calibModal').style.display='flex'; }, 100); 
+            return; 
+        } 
+        drawActiveShape(); 
+    }
+
+    map.on('click', addPoint);
+
+    function drawActiveShape() { activeLayer.eachLayer(l => { if(l instanceof L.Polyline && !(l instanceof L.CircleMarker)) activeLayer.removeLayer(l); }); if(activePoints.length > 1) { L.polyline(activePoints, {color: currentColor, weight: 2}).addTo(activeLayer); } updateRubberLine(); }
+    function updateRubberLine() { if(activePoints.length === 0 || (!svgLayer && !canvasTextLayer)) { if(rubberLine) map.removeLayer(rubberLine); rubberLine = null; return; } let lp = activePoints[activePoints.length-1]; let cp = snappedPoint || getLensCenterLatLng(); if(rubberLine) map.removeLayer(rubberLine); rubberLine = L.polyline([lp, cp], { color: currentColor, weight: 1.5, dashArray: '5,5' }).addTo(map); }
+    
+    function applyCalibration(){ 
+        let v=parseFloat(document.getElementById('calibVal').value); 
+        if(!v) return; 
+        scaleFactor = calculateDist(activePoints) / v; 
+        unit = document.getElementById('calibUnit').value; 
+        document.getElementById('calibModal').style.display='none'; 
+        activePoints=[]; 
+        activeMarkers.forEach(m=>m.remove()); 
+        activeMarkers=[]; 
+        activeLayer.clearLayers(); 
+        if(rubberLine) map.removeLayer(rubberLine); 
+        rubberLine=null; 
+        historyStack = []; 
+        redoStack = []; 
+        refreshMagneticPoints(); 
+        switchMode('dist'); 
+        savePageState(currentPage); 
+    }
+
+    function finishShape() { 
+        if(mode === 'scale' && activePoints.length === 2) { document.getElementById('calibModal').style.display='flex'; return; } 
+        if(activePoints.length > 1) { 
+            let finalMode = mode; 
+            if(mode === 'area') { if(activePoints.length > 2) finalMode = 'area'; else finalMode = 'dist'; } 
+            else { finalMode = 'dist'; } 
+            drawPermanentShape([...activePoints], finalMode, currentColor); 
+            historyStack.push({type: 'finish', mode: finalMode, points: [...activePoints], color: currentColor}); 
+            savePageState(currentPage); 
+        } 
+        activePoints=[]; 
+        activeMarkers.forEach(m=>m.remove());
+        activeMarkers=[]; 
+        activeLayer.clearLayers(); 
+        if(rubberLine) map.removeLayer(rubberLine); 
+        rubberLine=null; 
+        refreshMagneticPoints(); 
+    }
+    
+    // [V101: CRITICAL FIX - V87 UNDO RESTORE LOGIC]
+    function undoAction() {
+        if(historyStack.length === 0) return;
+        let last = historyStack.pop();
+        redoStack.push(last);
+
+        if(last.type === 'point') {
+            activePoints.pop();
+            let m = activeMarkers.pop();
+            if(m) map.removeLayer(m);
+            drawActiveShape();
+        } else if (last.type === 'finish') {
+            let shapeData = finishedShapes.pop();
+            if(shapeData && shapeData.layer) {
+                permanentLayer.removeLayer(shapeData.layer);
+            }
+            activePoints = [...last.points]; 
+            activeMarkers = activePoints.map(pt => L.circleMarker(pt, { color: last.color, radius: 0.8, fillColor: 'white', fillOpacity: 1 }).addTo(activeLayer)); 
+            drawActiveShape(); 
+        }
+        refreshMagneticPoints();
+        savePageState(currentPage);
+    }
+
+    function redoAction() {
+        if(redoStack.length === 0) return;
+        let next = redoStack.pop();
+        historyStack.push(next);
+
+        if(next.type === 'point') {
+            activePoints.push(next.latlng);
+            let m = L.circleMarker(next.latlng, { color: next.color, radius: 0.8, fillColor: 'white', fillOpacity: 1 }).addTo(activeLayer);
+            activeMarkers.push(m);
+            drawActiveShape();
+        } else if (next.type === 'finish') {
+            activePoints=[]; 
+            activeMarkers.forEach(m=>m.remove()); 
+            activeMarkers=[]; 
+            activeLayer.clearLayers(); 
+            if(rubberLine) map.removeLayer(rubberLine); 
+            rubberLine=null; 
+            drawPermanentShape(next.points, next.mode, next.color);
+        }
+        refreshMagneticPoints();
+        savePageState(currentPage);
+    }
+
+    document.getElementById('btnUndo').addEventListener('touchstart', function(e) { e.preventDefault(); undoAction(); }); document.getElementById('btnRedo').addEventListener('touchstart', function(e) { e.preventDefault(); redoAction(); });
+    function sequentialDelete() { if (activePoints.length > 0) { activePoints=[]; activeMarkers.forEach(m=>m.remove()); activeMarkers=[]; activeLayer.clearLayers(); if(rubberLine) map.removeLayer(rubberLine); rubberLine=null; } else if (finishedShapes.length > 0) { let last = finishedShapes.pop(); permanentLayer.removeLayer(last.layer); } refreshMagneticPoints(); savePageState(currentPage); }
+
+    function drawPermanentShape(pts, shpMode, shpColor) {
+        let shapeGroup = L.layerGroup();
+        let isArea = (shpMode === 'area' && pts.length > 2); 
+        let poly = isArea ? L.polygon(pts, {color: shpColor, weight: 2, fillOpacity: 0.15}) : L.polyline(pts, {color: shpColor, weight: 2});
+        
+        if(!isArea) { 
+            let p1 = map.latLngToContainerPoint(pts[0]);
+            let p2 = map.latLngToContainerPoint(pts[pts.length-1]);
+            let midX = (p1.x + p2.x) / 2;
+            let midY = (p1.y + p2.y) / 2;
+            let angleDeg = Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+            if(angleDeg > 90 || angleDeg < -90) angleDeg += 180; 
+
+            let midLatLng = map.containerPointToLatLng([midX, midY]);
+            let distValue = calculateDist(pts);
+            let distText = formatDist(distValue);
+
+            let currentBaseSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--text-size'));
+            let finalFontSize = currentBaseSize;
+            if (distValue < 200 && scaleFactor > 0) {
+                 let reductionFactor = 0.85 + (distValue / 200) * 0.05;
+                 if(distValue < 50) reductionFactor *= 0.5; 
+                 finalFontSize = currentBaseSize * reductionFactor;
+                 finalFontSize = Math.max(4, finalFontSize); 
+            }
+
+            let labelIcon = L.divIcon({
+                className: 'rotated-label-container',
+                html: `<div class="rotated-label" style="font-size: ${finalFontSize}px; transform: translate(-50%, -50%) rotate(${angleDeg}deg);">${distText}</div>`
+            });
+            L.marker(midLatLng, {icon: labelIcon, interactive: false}).addTo(shapeGroup);
+        } 
+        else { 
+            let centerPt = poly.getBounds().getCenter(); 
+            L.circleMarker(centerPt, {radius: 0.01, opacity:0, fillOpacity:0})
+             .bindTooltip(formatArea(calculateArea(pts)), {permanent: true, direction: "center", className: "area-tooltip"})
+             .addTo(shapeGroup); 
+        }
+        shapeGroup.addLayer(poly);
+        pts.forEach(pt => { L.circleMarker(pt, { color: shpColor, radius: 0.8, fillColor: 'white', fillOpacity: 1 }).addTo(shapeGroup); });
+        shapeGroup.addTo(permanentLayer);
+        finishedShapes.push({points: pts, color: shpColor, mode: shpMode, layer: shapeGroup});
+    }
+
+    function calculateDist(pts) { let d=0; for(let i=0;i<pts.length-1;i++) d+=map.distance(pts[i], pts[i+1]); return d; }
+    function calculateArea(l){let a=0,j=l.length-1;for(let i=0;i<l.length;i++){a+=(l[j].lng+l[i].lng)*(l[j].lat-l[i].lat);j=i;}return Math.abs(a/2.0);}
+    function formatDist(d) { return (scaleFactor>0 ? (d/scaleFactor).toFixed(2) : Math.round(d)) + " " + unit; }
+    function formatArea(a) { return (scaleFactor>0 ? (a/(scaleFactor**2)).toFixed(2) : Math.round(a)) + " sq " + unit; }
+    
+    function switchMode(m){ finishShape(); mode=m; document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('mode-active')); document.getElementById('btn'+m.charAt(0).toUpperCase()+m.slice(1)).classList.add('mode-active'); }
+    function updateColor(){ currentColor=document.getElementById('colorInput').value; }
+    function closeModal(id){ document.getElementById(id).style.display='none'; }
+    function closeExport(){ document.getElementById('exportModal').style.display='none'; }
+
+    function openExportModal() {
+        document.getElementById('magicCursor').style.visibility='hidden';
+        html2canvas(document.getElementById('map'), { useCORS: true, scale: 3 }).then(c => {
+            document.getElementById('captureImg').src = c.toDataURL('image/jpeg', 0.9);
+            document.getElementById('exportModal').style.display='flex';
+            document.getElementById('magicCursor').style.visibility='visible';
+        });
+    }
+    
+    function downloadFinalReport() {
+        const btnBar = document.getElementById('downloadAction');
+        btnBar.style.display = 'none';
+        setTimeout(() => {
+            html2canvas(document.getElementById('exportModal'), { 
+                scale: 3.0, 
+                useCORS: true, 
+                allowTaint: true,
+                backgroundColor: '#ffffff' 
+            }).then(canvas => {
+                canvas.toBlob(function(blob) {
+                    let link = document.createElement('a'); 
+                    link.download = "SKR_Report.jpg"; 
+                    link.href = URL.createObjectURL(blob); 
+                    link.click(); 
+                    btnBar.style.display = 'block';
+                }, 'image/jpeg');
+            });
+        }, 300); 
+    }
+
+    async function handleNewFile(e) { let f = e.target.files[0]; if(!f) return; document.getElementById('calibVal').value = ""; currentMapKey = 'map_' + Date.now(); pdfDoc = null; currentPage = 1; pageData = {}; 
+    localStorage.removeItem('active_overlay'); removeOverlay();
+    document.getElementById('loader').style.display='block'; try { pdfDoc = await pdfjsLib.getDocument({ data: await f.arrayBuffer(), disableFontFace: true, ignoreErrors: true }).promise; totalPages = pdfDoc.numPages; let d = { id: currentMapKey, name: f.name, pdfBlob: f, totalPages: totalPages, pageData: {} }; await localforage.setItem(currentMapKey, d); permanentLayer.clearLayers(); finishedShapes=[]; magneticPoints=[]; historyStack=[]; redoStack=[]; await renderPage(1); switchMode('scale'); } catch(err) { alert("Invalid File"); document.getElementById('loader').style.display='none'; } }
+    
+    async function loadDB(k) { closeModal('mapListModal'); let d = await localforage.getItem(k); currentMapKey = k; pdfDoc = await pdfjsLib.getDocument({ data: await d.pdfBlob.arrayBuffer(), disableFontFace: true, ignoreErrors: true }).promise; totalPages = d.totalPages || pdfDoc.numPages; pageData = d.pageData || {}; currentPage = 1; permanentLayer.clearLayers(); await renderPage(1); loadPageState(1); }
+
+    async function saveCurrentMapToDB() { if(!currentMapKey) return; let d = await localforage.getItem(currentMapKey); d.pageData = pageData; await localforage.setItem(currentMapKey, d); }
+    async function delDB(k) { if(confirm("Delete Map?")) { await localforage.removeItem(k); openMapList(currentOverlayKey ? 'overlay' : 'base'); } }
+
+    initSecurity();
+</script>
+</body>
+</html>
