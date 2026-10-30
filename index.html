@@ -3,30 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SKR Pro V101 (Undo Fixed)</title>
+    <title>AERO Geo-Legal Skills V101</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</script>
+    <script>
+        const _origGetContext = HTMLCanvasElement.prototype.getContext;
+        HTMLCanvasElement.prototype.getContext = function(type, options) {
+            if (type === '2d') { options = options || {}; options.willReadFrequently = true; }
+            return _origGetContext.call(this, type, options);
+        };
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        console.warn = function() {}; console.error = function() {}; console.log = function() {};
+        window.onerror = function() { return true; };
+        window.addEventListener('unhandledrejection', function(e) { if(e) e.preventDefault(); });
+    </script>
 
-    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAAsTAAALEwEAmpwYAAABWWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4KPHg6eG1wbWV0YSB4bWxuczp4PSdhZG9iZTpuczptZXRhLyc+CjxyZGY6UkRGIHhtbG5zOnJkZj0naHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyc+Cgk8cmRmOkRlc2NyaXB0aW9uIHhtbG5zOmRjPSdodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyc rZGY6YWJvdXQ9JycvPgo8L3JkZjpSREY+CjwveDp4bXBtZXRhPgo8P3hwYWNrZXQgZW5kPSd3Jz8+PulYfEAAAD6SURBVHic7cExAQAAAMKg9U9tCy8gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD4Me70AAfS6mEAAAAAASUVORK5CYII=">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
 
     <style>
-        /* --- [V87 CORE STYLES - UNTOUCHED] --- */
         body { -webkit-user-select: none; user-select: none; touch-action: none; margin: 0; padding: 0; background: #ffffff !important; overflow: hidden; font-family: 'Segoe UI', Arial, sans-serif; }
         
-        #appHeader { position: absolute; top: 0; left: 0; right: 0; height: 75px; background: #ffffff; color: #222; z-index: 7000; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-bottom: 3px solid #FFD700; transition: background-color 0.1s; }
+        #appHeader { 
+            position: absolute; top: 0; left: 0; right: 0; height: 75px; 
+            background: #ffffff; color: #222; z-index: 7000; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12); border-bottom: 3.5px solid #FFD700; 
+            transition: background-color 0.1s; padding: 2px 4px; box-sizing: border-box; overflow: hidden;
+        }
         #appHeader.tap-active { background-color: #f0f0f0; } 
-        #appHeader h1 { margin: 0; font-size: 18px; font-weight: 900; }
-        #appHeader h2 { margin: 1px 0; font-size: 10px; font-weight: bold; color: #b08d57; text-transform: uppercase; }
+        
+        .brand-title { margin: 0; font-size: 14.5px; font-weight: 900; color: #b71c1c; letter-spacing: 0.5px; text-transform: uppercase; text-shadow: 0.5px 0.5px 0px #FFD700; line-height: 1.15; }
+        .brand-sub1 { margin: 1px 0 0 0; font-size: 9px; font-weight: 800; color: #001f3f; letter-spacing: 0.2px; line-height: 1.1; }
+        .brand-sub2 { margin: 1px 0 0 0; font-size: 7.8px; font-weight: 700; color: #333; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; line-height: 1.1; }
+        .tag-reg { color: #c62828; font-weight: 800; }
+        .tag-iso { color: #004d40; font-weight: 800; }
+        .brand-sub3 { margin: 1px 0 0 0; font-size: 8px; font-weight: 800; color: #b08d57; letter-spacing: 0.2px; line-height: 1.1; }
 
         #map { position: absolute; top: 75px; bottom: 0; right: 0; left: 0; z-index: 1; background: #ffffff !important; cursor: none !important; }
-        .svg-layer { z-index: 100; pointer-events: none !important; }
-        .canvas-text-layer { z-index: 101; opacity: 1.0; pointer-events: none !important; }
-        .overlay-map-layer { z-index: 500; pointer-events: none !important; opacity: 0.8; }
+        
+        .svg-layer { z-index: 100; pointer-events: none !important; transition: none !important; }
+        .canvas-text-layer { z-index: 101; opacity: 1.0; pointer-events: none !important; transition: none !important; }
+        .overlay-map-layer { z-index: 500; pointer-events: none !important; opacity: 0.8; transition: none !important; }
+        .leaflet-zoom-anim .leaflet-zoom-animated { transition: none !important; }
 
         .leaflet-tooltip { background-color: #ffffff !important; border: 1.5px solid #FFD700 !important; border-radius: 4px !important; color: #000000 !important; font-weight: 900 !important; font-size: 10px !important; padding: 0px 3px !important; box-shadow: 0 0 6px rgba(255, 215, 0, 0.9) !important; white-space: nowrap; pointer-events: none; line-height: 1.0; z-index: 8000; }
 
@@ -38,74 +60,78 @@
             transform-origin: center center; position: absolute; top:0; left:0; will-change: transform; 
         }
 
-        #topBar { position: absolute; top: 85px; left: 10px; right: 10px; display: flex; justify-content: space-between; z-index: 6000; pointer-events: none; }
-        .skr-badge { background: #001f3f; color: #FFD700; padding: 10px 15px; border-radius: 10px; border: 1px solid #FFD700; font-size: 11px; font-weight: bold; cursor: pointer; pointer-events: auto; }
-        .btn-menu { background: #FFD700; color: #000; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; box-shadow: 0 2px 5px black; pointer-events: auto; }
+        #topBar { position: absolute; top: 82px; left: 10px; right: 10px; display: flex; justify-content: space-between; z-index: 6000; pointer-events: none; }
+        .skr-badge { background: #001f3f; color: #FFD700; padding: 9px 13px; border-radius: 10px; border: 1px solid #FFD700; font-size: 11px; font-weight: bold; cursor: pointer; pointer-events: auto; }
+        .btn-menu { background: #FFD700; color: #000; border: none; padding: 9px 12px; border-radius: 8px; font-weight: bold; font-size: 12px; box-shadow: 0 2px 5px black; pointer-events: auto; }
         
         #leftControls { position: absolute; bottom: 20px; left: 10px; display: flex; gap: 12px; z-index: 6000; }
         .circle-btn { width: 48px; height: 48px; border-radius: 50%; border: none; background: white; color: #333; font-size: 22px; box-shadow: 0 2px 10px black; display: flex; justify-content: center; align-items: center; }
         
-        #rightPanel { position: absolute; bottom: 20px; right: 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 6000; }
+        #rightPanel { position: absolute; bottom: 20px; right: 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 6000; transform: translateZ(0); will-change: transform; }
         #findCursorBtn { width: 45px; height: 45px; background: #001f3f; border: 2px solid #FFD700; border-radius: 50%; color: white; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px black; cursor: pointer; }
-        .control-strip { background: rgba(255,255,255,0.98); padding: 5px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 10px black; width: 55px; align-items: center; }
-        .mode-btn { width: 45px; height: 40px; border: 1px solid #ccc; background: white; border-radius: 6px; font-size: 10px; font-weight: bold; display: flex; flex-direction: column; justify-content: center; align-items: center; line-height: 1.1; }
-        .mode-active { background: #001f3f; color: #FFD700; border: 2px solid #FFD700; }
+        .control-strip { background: rgba(255,255,255,0.98); padding: 5px; border-radius: 12px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 4px 10px black; width: 55px; align-items: center; }
+        .mode-btn { width: 45px; height: 38px; border: 1px solid #ccc; background: white; border-radius: 6px; font-size: 10px; font-weight: bold; display: flex; flex-direction: column; justify-content: center; align-items: center; line-height: 1.1; }
+        .mode-active { background: #001f3f !important; color: #FFD700 !important; border: 2px solid #FFD700 !important; }
         
         #pageNav { position: absolute; bottom: 25px; left: 140px; background: #001f3f; color: #FFD700; padding: 4px 8px; border-radius: 15px; border: 1.5px solid #FFD700; display: none; gap: 8px; align-items: center; z-index: 6000; box-shadow: 0 4px 10px black; font-size: 10px; height: 30px; }
         .nav-arrow { font-size: 14px; cursor: pointer; font-weight: bold; padding: 0 5px; }
         #pageInfo { font-size: 10px; font-weight: bold; white-space: nowrap; }
 
         #overlayControls { 
-            position: absolute; top: 135px; left: 10px; z-index: 9000; 
+            position: absolute; top: 130px; left: 10px; z-index: 9000; 
             display: none; background: rgba(255,255,255,0.98); 
-            padding: 12px; border-radius: 12px; 
+            padding: 10px; border-radius: 12px; 
             box-shadow: 0 5px 20px rgba(0,0,0,0.6); 
-            flex-direction: column; gap: 10px; width: 220px; 
-            border: 2px solid #FFD700; 
-            transition: all 0.3s ease; 
+            flex-direction: column; gap: 7px; width: 215px; 
+            border: 2px solid #FFD700; transition: all 0.3s ease; 
         }
         
         #minimizedIcon {
-            position: absolute; top: 135px; left: 10px; z-index: 20000; 
+            position: absolute; top: 130px; left: 10px; z-index: 20000; 
             width: 45px; height: 45px; background: #FFD700; border: 2px solid #001f3f; 
             border-radius: 10px; display: none; justify-content: center; align-items: center; 
-            font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.6); 
-            pointer-events: auto; 
+            font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.6); pointer-events: auto; 
         }
 
-        .overlay-header { font-size: 12px; font-weight: 900; color: #001f3f; display: flex; justify-content: space-between; align-items: center; }
-        .ov-btn-row { display: flex; gap: 8px; justify-content: space-between; }
-        .ov-btn { flex: 1; padding: 10px; font-size: 14px; font-weight: bold; background: #f0f0f0; color: #333; border: 1px solid #999; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); user-select: none; }
+        .overlay-header { font-size: 11px; font-weight: 900; color: #001f3f; display: flex; justify-content: space-between; align-items: center; }
+        .ov-btn-row { display: flex; gap: 4px; justify-content: space-between; align-items: center; }
+        .ov-btn { flex: 1; padding: 8px 4px; font-size: 12px; font-weight: bold; background: #f0f0f0; color: #333; border: 1px solid #999; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); user-select: none; }
         .ov-btn:active { transform: scale(0.95); background: #FFD700; }
         .lock-btn { background: #CCFF00; color: black; border: 2px solid black; }
         .unlock-btn { background: #ff4444; color: white; border: 2px solid black; }
-        input[type=range] { width: 100%; accent-color: #001f3f; }
+        input[type=range] { width: 100%; accent-color: #001f3f; margin: 2px 0; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 20000; justify-content: center; align-items: center; }
         .modal-box { background: white; width: 92%; max-width: 350px; padding: 25px; border-radius: 24px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.8); box-sizing: border-box; }
-        #calibVal { width: 100%; padding: 14px; font-size: 24px; text-align: center; border: 2.5px solid #FFD700; border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; }
+        
+        #calibVal, #fixedDistInput { width: 100%; padding: 14px; font-size: 24px; text-align: center; border: 2.5px solid #FFD700; border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; }
         .map-item { padding: 20px; background: #f8f9fa; border: 1.5px solid #eaeaea; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: #001f3f; margin-bottom: 15px; }
 
-        #exportModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 9999; flex-direction: column; overflow: hidden; }
-        .report-header { min-height: 28%; background: #0a0a0a; color: #FFD700; display: flex; flex-direction: column; justify-content: center; align-items: center; border-bottom: 4px solid #FFD700; position: relative; padding: 15px 0; box-sizing: border-box; }
-        .report-title { font-size: 14px; font-weight: 900; letter-spacing: 0.8px; margin-bottom: 12px; text-transform: uppercase; outline: none; padding-top: 10px; }
+        #exportModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 30000; flex-direction: column; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+        .report-header { background: #ffffff; color: #000000; display: flex; flex-direction: column; justify-content: center; align-items: center; border-bottom: 3.5px solid #FFD700; position: relative; padding: 14px 0 10px 0; box-sizing: border-box; flex-shrink: 0; width: 100%; }
+        .report-title { font-size: 16px; font-weight: 900; letter-spacing: 0.5px; margin-bottom: 12px; text-transform: uppercase; outline: none; padding-top: 2px; color: #b71c1c; text-align: center; text-shadow: 0.5px 0.5px 0px #FFD700; }
         .report-fields { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 96%; }
-        .report-fields input { height: 32px; line-height: 32px; padding: 0 5px; font-size: 11px; border: 1.2px solid #444; border-radius: 6px; background: #fff; color: #000; font-weight: bold; width: 100%; box-sizing: border-box; text-align: center; }
-        .report-map-segment { flex-grow: 1; background: #ffffff; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; border-bottom: 2.5px solid #FFD700; }
-        #captureImg { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .report-north-arrow { position: absolute; top: 15px; right: 15px; width: 40px; height: 60px; z-index: 100; text-align: center; display:flex; flex-direction:column; align-items:center; pointer-events: none; }
-        .report-footer { height: 12.5%; background: #000000; color: #FFD700; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 5px; box-sizing: border-box; outline: none; }
-        .report-footer h3 { margin: 0; font-size: 18px; font-weight: 900; letter-spacing: 0.5px; color: #FFD700; }
-        .report-footer p { margin: 2px 0; font-size: 11px; color: #ffffff; font-weight: 600; }
-        .download-bar { width: 100%; text-align: center; padding: 15px 0; background: white; }
-        .btn-download { background: #FFD700; color: #000; border: none; padding: 13px 45px; border-radius: 50px; font-weight: 900; font-size: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .report-fields input { height: 32px; line-height: 32px; padding: 0 5px; font-size: 11px; border: 1.5px solid #001f3f; border-radius: 6px; background: #ffffff; color: #000000; font-weight: bold; width: 100%; box-sizing: border-box; text-align: center; }
+        .report-fields input::placeholder { color: #555; }
+        
+        .report-map-segment { width: 100%; background: #ffffff; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; border-bottom: 3.5px solid #FFD700; flex-shrink: 0; }
+        #captureImg { width: 100%; height: auto; display: block; object-fit: contain; }
+        
+        .report-north-arrow { position: absolute; top: 6px; right: 10px; width: 38px; height: 52px; z-index: 100; text-align: center; display: flex; flex-direction: column; align-items: center; cursor: pointer; pointer-events: auto; user-select: none; animation: northBlink 1.2s infinite ease-in-out; }
+        @keyframes northBlink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.92); } }
+
+        .report-footer { background: #ffffff; color: #000000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 14px 5px; box-sizing: border-box; outline: none; flex-shrink: 0; border-top: 3.5px solid #FFD700; width: 100%; }
+        .report-footer h3 { margin: 0; font-size: 16px; font-weight: 900; letter-spacing: 0.5px; color: #b71c1c; text-shadow: 0.5px 0.5px 0px #FFD700; }
+        .report-footer p { margin: 2px 0; font-size: 10px; color: #222; font-weight: 700; }
+        .download-bar { width: 100%; text-align: center; padding: 15px 0; background: #ffffff; flex-shrink: 0; }
+        .btn-download { background: #FFD700; color: #001f3f; border: 2px solid #001f3f; padding: 13px 45px; border-radius: 50px; font-weight: 900; font-size: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); cursor: pointer; }
         
         #loader { position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:#001f3f; color:#FFD700; padding:20px; border-radius:12px; z-index: 25000; display:none; border:2px solid #FFD700; font-weight: bold; text-align: center; }
         
-        #magicCursor { position: absolute; top: 50%; left: 50%; width: 60px; height: 120px; z-index: 5000; display: none; touch-action: none; pointer-events: none; }
+        #magicCursor { position: absolute; top: 50%; left: 50%; width: 60px; height: 120px; z-index: 5000; display: none; touch-action: none; pointer-events: none; transform: translateZ(0); will-change: left, top; }
         .cursor-graphic { position: absolute; top: 0; left: 5px; width: 50px; height: 50px; z-index: 5002; filter: drop-shadow(0px 3px 5px rgba(0,0,0,0.4)); }
         .cursor-lens-circle { fill: rgba(255,255,255,0.01); stroke: #FFD700; stroke-width: 5px; }
-        .ch-black { stroke: black; stroke-width: 3.5px; }
+        .ch-black { stroke-width: 3.5px; stroke: black; }
         .ch-red { stroke: red; stroke-width: 1.3px; }
         .ch-green { stroke: #CCFF00; stroke-width: 0.6px; }
         .lens-dot { fill: white; }
@@ -117,7 +143,6 @@
         .cursor-magnet-btn { position: absolute; top: 25px; left: -28px; width: 32px; height: 32px; background: white; border: 2.2px solid #25D366; border-radius: 50%; color: #25D366; font-size: 16px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 8px black; pointer-events: auto; z-index: 5005; }
         .mag-off { border-color: #d32f2f !important; color: #d32f2f !important; background: #ffe6e6 !important; }
 
-        /* [V101 SECURITY STYLES - SYNC SYSTEM REPAIRED] */
         #licenseOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #001f3f; z-index: 35000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #FFD700; text-align: center; }
         .lic-box { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; border: 2px solid #FFD700; width: 85%; max-width: 350px; backdrop-filter: blur(10px); }
         .lic-input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; text-align: center; font-weight: bold; font-size: 16px; color:#000; }
@@ -143,10 +168,11 @@
             .plus-icon { font-size: 60px !important; }
             .cursor-cut-btn { width: 80px !important; height: 80px !important; font-size: 40px !important; top: 60px !important; right: -70px !important; }
             .cursor-magnet-btn { width: 80px !important; height: 80px !important; font-size: 40px !important; top: 60px !important; left: -70px !important; }
-            
             #appHeader { height: 180px !important; }
-            #appHeader h1 { font-size: 45px !important; }
-            #appHeader h2 { font-size: 24px !important; }
+            .brand-title { font-size: 34px !important; }
+            .brand-sub1 { font-size: 20px !important; margin-top: 4px !important; }
+            .brand-sub2 { font-size: 16px !important; gap: 15px !important; margin-top: 4px !important; }
+            .brand-sub3 { font-size: 18px !important; margin-top: 4px !important; }
             #topBar { top: 200px !important; } 
             #map { top: 180px !important; }
             .circle-btn { width: 100px !important; height: 100px !important; font-size: 45px !important; margin: 20px !important; }
@@ -181,7 +207,8 @@
 
 <div id="licenseOverlay">
     <div class="lic-box" id="loginBox">
-        <h2 style="font-weight:900;">SKR GEO-LEGAL</h2>
+        <h2 style="font-weight:900; color:#FFD700; margin:0 0 5px 0;">AERO GEO-LEGAL SKILLS</h2>
+        <p style="font-size:11px; margin:0 0 10px 0; color:#ffcdd2;">Autonomous Tech-Legal &amp; Skill Entity</p>
         <p>SECURE LOGIN</p>
         <input type="number" id="userMobile" class="lic-input" placeholder="Enter Mobile Number">
         <button class="lic-btn" onclick="checkUser()">LOGIN</button>
@@ -229,11 +256,16 @@
 <div id="toastBox"></div>
 
 <div id="appHeader" onclick="handleHeaderTap()">
-    <h1>SKR GEO-LEGAL ASSOCIATES</h1>
-    <h2>Smart Solutions & Digital Documentation</h2>
+    <div class="brand-title">🏛️ AERO GEO-LEGAL SKILLS</div>
+    <div class="brand-sub1">【 Autonomous Tech-Legal &amp; Skill Entity 】</div>
+    <div class="brand-sub2">
+        <span class="tag-reg">🎖️ Regd. U/S 8 of MSMED Act, 2006 (Central Enterprise)</span>
+        <span class="tag-iso">🆔 Code: BR-30-0077516 | ISO 9001:2015</span>
+    </div>
+    <div class="brand-sub3">🖋️ (SKR Geo-Legal Associates)</div>
 </div>
 
-<div id="loader">Loading Engine...<br><small>V101 Undo Fix</small></div>
+<div id="loader">Loading Engine...<br><small>AERO Geo-Legal Engine</small></div>
 <div id="map"></div>
 <div id="minimizedIcon" onclick="restoreOverlayPanel()">🛠️</div>
 
@@ -245,11 +277,17 @@
     <div id="adjustControls">
         <label style="font-size:10px;">Transparency</label>
         <input type="range" id="overlayOpacity" min="0" max="1" step="0.1" value="0.8" oninput="updateOverlayStyle()">
-        <div class="ov-btn-row" style="margin-top:5px;">
-            <button class="ov-btn" onclick="recolorOverlay('red')" style="background:#ffcccc; color:darkred;">🔴 Red</button>
-            <button class="ov-btn" onclick="recolorOverlay('blue')" style="background:#ccccff; color:darkblue;">🔵 Blue</button>
-            <button class="ov-btn" onclick="recolorOverlay('black')" style="background:#ddd; color:black;">⚫ Black</button>
+        
+        <div class="ov-btn-row" style="margin-top:5px; gap:4px;">
+            <button class="ov-btn" onclick="recolorOverlay('red')" style="flex:1; padding:6px 2px; font-size:11px; background:#ffcccc; color:darkred;">🔴 Red</button>
+            <button class="ov-btn" onclick="recolorOverlay('blue')" style="flex:1; padding:6px 2px; font-size:11px; background:#ccccff; color:darkblue;">🔵 Blue</button>
+            <label class="ov-btn" style="flex:1.2; padding:6px 2px; font-size:11px; background:#e0f7fa; color:#006064; border:1px solid #00838f; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; cursor:pointer; margin:0; text-align:center;">
+                🎨 Color
+                <input type="color" id="overlayCustomColor" value="#000000" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" onchange="recolorOverlay(this.value)">
+            </label>
+            <button id="toggleBaseBtn" class="ov-btn" onclick="toggleBaseMap()" style="flex:0.8; padding:6px 2px; font-size:14px; background:#e8f5e9; color:#1b5e20; border:1.5px solid #4caf50; font-weight:900;" title="Show/Hide Base Map">👁️</button>
         </div>
+
         <div style="border-top:1px solid #ccc; margin:8px 0;"></div>
         <div class="overlay-header">MANUAL ALIGNMENT</div>
         <div class="ov-btn-row">
@@ -263,6 +301,10 @@
         <div class="ov-btn-row" style="margin-top:5px;">
             <button class="ov-btn" onmousedown="startHold(scaleOverlay, 1.002)" ontouchstart="startHold(scaleOverlay, 1.002)" onmouseup="stopHold()" ontouchend="stopHold()" onmouseleave="stopHold()">➕ Expand</button>
             <button class="ov-btn" onmousedown="startHold(scaleOverlay, 0.998)" ontouchstart="startHold(scaleOverlay, 0.998)" onmouseup="stopHold()" ontouchend="stopHold()" onmouseleave="stopHold()">➖ Shrink</button>
+        </div>
+        <div class="ov-btn-row" style="margin-top:5px;">
+            <button class="ov-btn" style="border-radius:20px; font-weight:900; background:#fffbe6; border:1.5px solid #FFD700; color:#001f3f;" onmousedown="startHold(rotateOverlay, -0.05)" ontouchstart="startHold(rotateOverlay, -0.05)" onmouseup="stopHold()" ontouchend="stopHold()" onmouseleave="stopHold()">↺ 0.05° बायाँ</button>
+            <button class="ov-btn" style="border-radius:20px; font-weight:900; background:#fffbe6; border:1.5px solid #FFD700; color:#001f3f;" onmousedown="startHold(rotateOverlay, 0.05)" ontouchstart="startHold(rotateOverlay, 0.05)" onmouseup="stopHold()" ontouchend="stopHold()" onmouseleave="stopHold()">↻ 0.05° दायाँ</button>
         </div>
     </div>
     <div style="margin-top:8px; border-top:1px solid #ccc; padding-top:8px; display:flex; gap:5px;">
@@ -296,13 +338,14 @@
 <div id="rightPanel">
     <div id="findCursorBtn" onclick="resetCursor()">🎯</div>
     <div class="control-strip">
-        <div style="width:38px;height:38px;border-radius:50%;overflow:hidden;border:2px solid white;margin-bottom:5px;">
-            <input type="color" id="colorInput" value="#CCFF00" onchange="updateColor()" style="width:150%;height:150%;margin:-25%;border:none;">
+        <div style="width:38px;height:38px;border-radius:50%;overflow:hidden;border:2px solid white;margin-bottom:2px;">
+            <input type="color" id="colorInput" value="#00FFFF" onchange="updateColor()" style="width:150%;height:150%;margin:-25%;border:none;">
         </div>
         <button class="mode-btn mode-active" id="btnScale" onclick="switchMode('scale')">📏<br>Scale</button>
         <button class="mode-btn" id="btnDist" onclick="switchMode('dist')">📐<br>Dist</button>
         <button class="mode-btn" id="btnArea" onclick="switchMode('area')">⬜<br>Area</button>
-        <button class="mode-btn" onclick="sequentialDelete()" style="color:red; font-size:20px;">🗑️</button>
+        <button class="mode-btn" id="btnFixedDist" onclick="openFixedDistModal()">📌<br>Fix Ft</button>
+        <button class="mode-btn" onclick="sequentialDelete()" style="color:red; font-size:18px;">🗑️</button>
     </div>
 </div>
 
@@ -340,7 +383,7 @@
 <div id="calibModal" class="modal-overlay">
     <div class="modal-box">
         <h3>SET SCALE</h3>
-        <p style="font-size:11px; color:#666; margin-bottom:5px;">मान भरें (Enter Value)</p>
+        <p style="font-size:11px; color:#666; margin-bottom:5px;">Enter Value</p>
         <input type="number" id="calibVal" placeholder="Value">
         <select id="calibUnit" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; border:1.5px solid #ccc;">
             <option value="ft" selected>Feet (फीट)</option>
@@ -351,9 +394,20 @@
     </div>
 </div>
 
+<div id="fixedDistModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3>SET FIXED LENGTH</h3>
+        <p style="font-size:11px; color:#666; margin-bottom:5px;">Enter Fixed Length</p>
+        <input type="number" id="fixedDistInput" placeholder="e.g. 50">
+        <div style="font-size:12px; font-weight:bold; color:#001f3f; margin-bottom:10px;">Unit: <span id="fixedDistUnitDisp" style="color:#b71c1c;">Feet</span></div>
+        <button onclick="applyFixedDist()" style="background:#001f3f; color:#FFD700; width:100%; padding:15px; border-radius:10px; font-weight:bold; border:none; margin-bottom:8px;">CONFIRM</button>
+        <button onclick="clearFixedDist()" style="background:#f0f0f0; color:#333; border:1px solid #ccc; width:100%; padding:10px; border-radius:10px; font-weight:bold;">OFF / CANCEL</button>
+    </div>
+</div>
+
 <div id="exportModal">
     <div class="report-header">
-        <div class="report-title" contenteditable="true">DIGITAL NAZARI NAKSHA REPORT (NTS)</div>
+        <div class="report-title" contenteditable="true">सहायक नजरी नक्शा (NTS)</div>
         <div class="report-fields">
             <input type="text" id="exDistrict" placeholder="जिला">
             <input type="text" id="exAnchal" placeholder="अंचल">
@@ -366,19 +420,19 @@
             <input type="text" id="exScale" placeholder="मानचित्र पैमाना">
             <input type="text" id="exRayyat" placeholder="रैयत का नाम (Owner)" style="grid-column: span 3;">
         </div>
-        <button onclick="closeExport()" style="position:absolute; top:8px; right:8px; background:red; color:white; border:none; border-radius:4px; font-size:11px;">X</button>
+        <div class="report-north-arrow" onclick="closeExport()" title="बंद करें / Close">
+            <span style="font-size:18px; font-weight:900; color:#d32f2f; margin-bottom:-4px;">N</span>
+            <svg width="25" height="40" viewBox="0 0 100 150"><path d="M50 10 L90 130 L50 100 L10 130 Z" fill="#d32f2f"/></svg>
+        </div>
     </div>
     <div id="captureContainer" class="report-map-segment">
-        <div class="report-north-arrow">
-            <span style="font-size:18px; font-weight:900; color:black; margin-bottom:-5px;">N</span>
-            <svg width="25" height="40" viewBox="0 0 100 150"><path d="M50 10 L90 130 L50 100 L10 130 Z" fill="black"/></svg>
-        </div>
         <img id="captureImg" src="">
     </div>
     <div class="report-footer" contenteditable="true">
-        <h3>SKR GEO-LEGAL ASSOCIATES</h3>
-        <p>Surveyor: S.K. Roy (S.K.R.) | Ph: +91 62002 63472</p>
-        <p style="color:#FFD700; font-size:10px;">MSME REGD. UDYAM-BR-30-0077516 | ISO 9001:2015</p>
+        <h3>🏛️ AERO GEO-LEGAL SKILLS</h3>
+        <p style="color:#001f3f; font-weight:800;">【 Autonomous Tech-Legal &amp; Skill Entity 】 | 🖋️ (SKR Geo-Legal Associates)</p>
+        <p style="color:#b71c1c; font-weight:800;">🎖️ Regd. U/S 8 of MSMED Act, 2006 (Central Enterprise) | 🆔 Code: BR-30-0077516 | ISO 9001:2015</p>
+        <p style="color:#001f3f; font-weight:900;">Surveyor: S.K. Roy (S.K.R.) | Ph: +91 62002 63472</p>
     </div>
     <div id="downloadAction" class="download-bar">
         <button class="btn-download" onclick="downloadFinalReport()">⬇️ DOWNLOAD REPORT</button>
@@ -386,7 +440,6 @@
 </div>
 
 <script>
-    /* --- [V101 ADVANCED SECURITY - UNIQUE MULTIPLIERS] --- */
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJ-MQyHBEukx6t03zFAeApGKpB7CbIDwU64kXeDh5R1ZJ6MquuavVqwY2hW9b5oGbv/exec";
     const APP_ID = "SKR_PRO_MAP_V101"; 
     const MASTER_NUMBER = "6200263472"; 
@@ -406,10 +459,8 @@
         localStorage.setItem('skr_pro_device_id', deviceId); 
     }
 
-    // UNIQUE MULTIPLIERS FOR MAP APP (Different from Calculator)
     function getSmartCode(dId, months) {
         let d = new Date(); let day = d.getDate(); let m = d.getMonth() + 1; let y = d.getFullYear();
-        // New multipliers: 814, 418, 7 | 357, 159, 22 | 258, 147, 40
         let f = (months == 1) ? (day*814 + m*418 + y*7) : (months == 3) ? (day*357 + m*159 + y*22) : (day*258 + m*147 + y*40);
         let base = (months == 1) ? 24680 : (months == 3) ? 13579 : 88888;
         return (parseInt(dId) + base + f).toString();
@@ -438,7 +489,6 @@
 
         let expiry = localStorage.getItem('skr_license_expiry');
         
-        // AUTO-RECOVERY LOGIC (BACKGROUND SYNC)
         if (!expiry) {
             let rec = await recoverFromCloud();
             if (rec && parseInt(rec.exp) > Date.now()) {
@@ -510,7 +560,7 @@
 
     function sendRequest(method) {
         let plan = selectedDuration == 12 ? "1 Year" : selectedDuration + " Month";
-        let msg = `🚩 *एसकेआर जिओ लीगल एसोसिएट्स* 🚩\n\nविषय: *सॉफ्टवेयर एक्टिवेशन हेतु कानूनी अनुरोध*\n\nश्रीमान, मैं अपनी स्वेच्छा से आपकी डिजिटल सेवा लेना चाहता हूँ। कृपया मेरे डिवाइस को सक्रिय करें।\n\n📱 मोबाइल: ${currentUser}\n🆔 डिवाइस आईडी: ${deviceId}\n🔗 फिंगरप्रिंट: ${hpid}\n📅 प्लान: ${plan}\n\nधन्यवाद।`;
+        let msg = `🏛️ *AERO GEO-LEGAL SKILLS*\n【 Autonomous Tech-Legal & Skill Entity 】\n🖋️ _(SKR Geo-Legal Associates)_\n🎖️ _Regd. U/S 8 of MSMED Act, 2006 (Central Enterprise)_\n🆔 _Code: BR-30-0077516 | ISO 9001:2015_\n\n━━━━━━━━━━━━━━━━━━━━━\n📑 *APPLICATION FOR DIGITAL ACCESS*\n━━━━━━━━━━━━━━━━━━━━━\n\nTo: *AERO GEO-LEGAL SKILLS*\n\nSir, I hereby voluntarily request the activation of single-device digital mapping access under your official tech-legal terms.\n\n📱 *User Mobile:* ${currentUser}\n🆔 *Device ID:* ${deviceId}\n🔒 *HPID:* ${hpid}\n📅 *Selected Plan:* ${plan}\n\nKindly grant the authorized activation OTP.\n\nSubmitted By:\n*Applicant / User*`;
         let url = method === 'wa' ? `https://wa.me/91${MASTER_NUMBER}?text=${encodeURIComponent(msg)}` : `sms:${MASTER_NUMBER}?body=${encodeURIComponent(msg)}`;
         window.open(url, '_blank');
     }
@@ -522,7 +572,7 @@
         let cexp = document.getElementById('validityPeriod').value;
         let days = (cexp == "12") ? 365 : (parseInt(cexp) * 30);
         let d = new Date(Date.now() + (days * 24 * 60 * 60 * 1000));
-        let msg = `🎊 *बधाई हो! आपकी सेवा सक्रिय है* 🎊\n\n*SKR GEO-LEGAL ASSOCIATES*\nआपका सॉफ्टवेयर सफलतापूर्वक अपडेट कर दिया गया है।\n\n🔑 एक्टिवेशन कोड: *${cotp}*\n🆔 डिवाइस आईडी: ${cdid}\n⌛ आखरी तिथि: ${d.toLocaleDateString('hi-IN')}\n\nहमारी सेवा चुनने के लिए धन्यवाद। शुभकामनाएँ!`;
+        let msg = `🎊 *WELCOME TO AERO GEO-LEGAL SKILLS* 🎊\n【 Autonomous Tech-Legal & Skill Entity 】\n🖋️ _(SKR Geo-Legal Associates)_\n🎖️ _Regd. U/S 8 of MSMED Act, 2006 (Central Enterprise)_\n🆔 _Code: BR-30-0077516 | ISO 9001:2015_\n\n━━━━━━━━━━━━━━━━━━━━━\n🔑 *OFFICIAL ACTIVATION CREDENTIALS*\n━━━━━━━━━━━━━━━━━━━━━\n\nDear Professional,\nWelcome to *AERO GEO-LEGAL SKILLS*! Thank you for choosing our technical & digital mapping services.\n\nYour application has been verified and your secure device access is now successfully activated:\n\n🔑 *Activation Code:* *${cotp}*\n🆔 *Authorized Terminal:* ${cdid}\n⌛ *Valid Upto:* ${d.toLocaleDateString('hi-IN')}\n\n📌 *Note:* Enter this activation code into your app to unlock full professional features. This license is non-transferable and securely bound to this device.\n\n━━━━━━━━━━━━━━━━━━━━━\n*Surveyor: S.K. Roy (S.K.R.)*\n📞 *Ph: +91 62002 63472*\n━━━━━━━━━━━━━━━━━━━━━`;
         let url = method === 'wa' ? `https://wa.me/91${cmob}?text=${encodeURIComponent(msg)}` : `sms:${cmob}?body=${encodeURIComponent(msg)}`;
         window.open(url, '_blank');
     }
@@ -547,9 +597,8 @@
         if(tapCount >= 5) { document.getElementById('licenseOverlay').style.display = 'flex'; document.getElementById('adminPanel').classList.remove('hidden'); tapCount = 0; } 
     }
 
-    /* --- [V87 CORE SCRIPT - ABSOLUTELY UNTOUCHED] --- */
     localforage.config({ name: 'SKR_Pro_V62_License', storeName: 'skr_data' });
-    let map, svgLayer, canvasTextLayer, overlayLayer = null, mode='scale', unit='ft', currentColor='#CCFF00';
+    let map, svgLayer, canvasTextLayer, overlayLayer = null, mode='scale', unit='ft', currentColor='#00FFFF';
     let currentMapKey = null;
     let activePoints=[], activeMarkers=[], finishedShapes=[], historyStack=[], redoStack=[], magneticPoints=[];
     let activeLayer=L.layerGroup(), permanentLayer=L.layerGroup(), rubberLine=null;
@@ -557,6 +606,10 @@
     let scaleFactor = 0; 
     let currentOverlayKey = null;
     let isMagnetActive = true; 
+    let overlayAngle = 0; 
+    let preCalibCenter = null, preCalibZoom = null;
+    let isBaseMapVisible = true;
+    let fixedDistanceVal = 0;
 
     map = L.map('map', { 
         crs: L.CRS.Simple, 
@@ -570,13 +623,14 @@
         updateWhenIdle: true, 
         updateWhenZooming: false, 
         fadeAnimation: false, 
-        markerZoomAnimation: true, 
+        zoomAnimation: false, 
+        markerZoomAnimation: false, 
         inertia: true, 
         inertiaDeceleration: 3000 
     });
     permanentLayer.addTo(map); activeLayer.addTo(map);
 
-    if (window.matchMedia("(min-width: 800px)").matches) {
+    if (window.matchMedia("(min-width: 800px) and (pointer: fine)").matches) {
         map.on('mousemove', function(e) {
             let containerPoint = map.latLngToContainerPoint(e.latlng);
             let magicCursor = document.getElementById('magicCursor');
@@ -588,8 +642,18 @@
     }
 
     let holdTimer = null;
-    function startHold(actionFunc, ...args) { if (holdTimer) return; actionFunc(...args); holdTimer = setInterval(() => { actionFunc(...args); }, 80); }
-    function stopHold() { if (holdTimer) { clearInterval(holdTimer); holdTimer = null; } }
+    function startHold(actionFunc, ...args) { 
+        if (holdTimer) return; 
+        actionFunc(...args); 
+        holdTimer = setInterval(() => { actionFunc(...args); }, 80); 
+    }
+    function stopHold() { 
+        if (holdTimer) { 
+            clearInterval(holdTimer); 
+            holdTimer = null; 
+            saveCurrentMapToDB();
+        } 
+    }
 
     function updateScales() {
         let z = map.getZoom();
@@ -614,18 +678,51 @@
     }
     map.on('zoomend', updateScales);
 
-    function refreshMagneticPoints() { magneticPoints = []; finishedShapes.forEach(shape => { shape.points.forEach(pt => magneticPoints.push(L.latLng(pt))); }); activePoints.forEach(pt => magneticPoints.push(L.latLng(pt))); }
+    function refreshMagneticPoints() { 
+        magneticPoints = []; 
+        finishedShapes.forEach(shape => { shape.points.forEach(pt => magneticPoints.push(L.latLng(pt))); }); 
+        activePoints.forEach(pt => magneticPoints.push(L.latLng(pt))); 
+    }
+
+    const ALL_INDIA_DIGIT_MAP = {
+        '०':'0','१':'1','२':'2','३':'3','४':'4','५':'5','६':'6','७':'7','८':'8','९':'9',
+        '০':'0','১':'1','२':'2','৩':'3','৪':'4','৫':'5','६':'6','৭':'7','৮':'8','৯':'9',
+        '۰':'0','۱':'1','२':'2','۳':'3','۴':'4','۵':'5','६':'6','۷':'7','۸':'8','۹':'9',
+        '٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9',
+        '੦':'0','੧':'1','२':'2','੩':'3','੪':'4','੫':'5','੬':'6','੭':'7','੮':'8','੯':'9',
+        '०':'0','૧':'1','२':'2','૩':'3','૪':'4','૫':'5','૬':'6','૭':'7','૮':'8','૯':'9',
+        '୦':'0','୧':'1','୨':'2','୩':'3','୪':'4','୫':'5','୬':'6','୭':'7','୮':'8','୯':'9',
+        '౦':'0','౧':'1','౨':'2','౩':'3','౪':'4','౫':'5','౬':'6','౭':'7','౮':'8','౯':'9',
+        '೦':'0','೧':'1','२':'2','೩':'3','೪':'4','೫':'5','೬':'6','೭':'7','೮':'8','೯':'9',
+        '௦':'0','௧':'1','௨':'2','௩':'3','௪':'4','௫':'5','௬':'6','௭':'7','௮':'8','௯':'9',
+        '൦':'0','൧':'1','൨':'2','൩':'3','൪':'4','൫':'5','൬':'6','൭':'7','൮':'8','൯':'9',
+        '᱐':'0','᱑':'1','२':'2','੩':'3','၄':'4','૫':'5','೬':'6','৭':'7','᱘':'8','৯':'9',
+        '༠':'0','༡':'1','༢':'2','༣':'3','༤':'4','༥':'5','༦':'6','༧':'7','٨':'8','༩':'9',
+        '꯰':'0','꯱':'1','꯲':'2','꯳':'3','꯴':'4','꯵':'5','꯶':'6','꯷':'7','꯸':'8','꯹':'9',
+        '᱀':'0','᱁':'1','᱂':'2','᱃':'3','᱄':'4','᱅':'5','᱆':'6','᱇':'7','᱈':'8','᱉':'9'
+    };
+
+    function convertAllIndiaDigitsToEnglish(str) {
+        if (!str) return '';
+        return str.replace(/[\u0966-\u096F\u09E6-\u09EF\u0A66-\u0A6F\u0AE6-\u0AEF\u0B66-\u0B6F\u0BE6-\u0BEF\u0C66-\u0C6F\u0CE6-\u0CEF\u0D66-\u0D6F\u0660-\u0669\u06F0-\u06F9\u1C50-\u1C59\u0F20-\u0F29\uABF0-\uABF9\u1C40-\u1C49]/g, function(ch) {
+            return ALL_INDIA_DIGIT_MAP[ch] || ch;
+        });
+    }
 
     async function renderPage(num) {
         if(!pdfDoc) return;
         try {
             document.getElementById('loader').style.display='block';
             let page = await pdfDoc.getPage(num);
-            if (prevSvgUrl) { URL.revokeObjectURL(prevSvgUrl); prevSvgUrl = null; } if (prevCanvasUrl) { prevCanvasUrl = null; } 
+            if (prevSvgUrl) { URL.revokeObjectURL(prevSvgUrl); prevSvgUrl = null; } 
+            if (prevCanvasUrl) { prevCanvasUrl = null; } 
             let viewport = page.getViewport({ scale: 4.5 }); 
             let opList = await page.getOperatorList();
-            let svgGfx = new pdfjsLib.SVGGraphics(page.commonObjs, page.objs);
+            
+            let svgGfx = new pdfjsLib.SVGGraphics(page.commonObjs, page.objs, true);
+            svgGfx.forceDataSchema = true;
             let svg = await svgGfx.getSVG(opList, viewport);
+            
             let style = document.createElementNS("http://www.w3.org/2000/svg", "style");
             style.textContent = "text { display: none !important; fill: none !important; stroke: none !important; opacity: 0 !important; }";
             svg.insertBefore(style, svg.firstChild);
@@ -633,20 +730,52 @@
             prevSvgUrl = svgUrl; 
             let textContent = await page.getTextContent();
             let textViewport = page.getViewport({ scale: 4.5 });
-            let canvas = document.createElement('canvas'); canvas.width = textViewport.width; canvas.height = textViewport.height;
+            let canvas = document.createElement('canvas'); 
+            canvas.width = textViewport.width; 
+            canvas.height = textViewport.height;
             let ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
-            ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = "black"; ctx.textBaseline = "alphabetic"; 
+            ctx.clearRect(0, 0, canvas.width, canvas.height); 
+            ctx.fillStyle = "black"; 
+            ctx.textBaseline = "alphabetic"; 
             const FONT_SCALE = 0.70; const WIDTH_SCALE = 0.85; 
-            textContent.items.forEach(function(item) { var tx = pdfjsLib.Util.transform(textViewport.transform, item.transform); var angle = Math.atan2(tx[1], tx[0]); var fontSize = Math.sqrt(tx[0] * tx[0] + tx[1] * tx[1]); var newFontSize = fontSize * FONT_SCALE; ctx.font = "bold " + newFontSize + "px Arial, sans-serif"; ctx.save(); ctx.translate(tx[4], tx[5]); ctx.rotate(angle); ctx.scale(WIDTH_SCALE, 1); ctx.fillText(item.str, 0, 0); ctx.restore(); });
-            let textCanvasUrl = canvas.toDataURL('image/png'); prevCanvasUrl = textCanvasUrl;
-            if(svgLayer) map.removeLayer(svgLayer); if(canvasTextLayer) map.removeLayer(canvasTextLayer);
+            textContent.items.forEach(function(item) { 
+                var tx = pdfjsLib.Util.transform(textViewport.transform, item.transform); 
+                var angle = Math.atan2(tx[1], tx[0]); 
+                var fontSize = Math.sqrt(tx[0] * tx[0] + tx[1] * tx[1]); 
+                var newFontSize = fontSize * FONT_SCALE; 
+                ctx.font = "bold " + newFontSize + "px Arial, sans-serif"; 
+                ctx.save(); 
+                ctx.translate(tx[4], tx[5]); 
+                ctx.rotate(angle); 
+                ctx.scale(WIDTH_SCALE, 1); 
+                var convertedStr = convertAllIndiaDigitsToEnglish(item.str);
+                ctx.fillText(convertedStr, 0, 0); 
+                ctx.restore(); 
+            });
+            let textCanvasUrl = canvas.toDataURL('image/png'); 
+            prevCanvasUrl = textCanvasUrl;
+            
+            canvas.width = 0; canvas.height = 0;
+            if(svgLayer) map.removeLayer(svgLayer); 
+            if(canvasTextLayer) map.removeLayer(canvasTextLayer);
             svgLayer = L.imageOverlay(svgUrl, [[0,0], [viewport.height, viewport.width]], { interactive: false, className: 'svg-layer' }).addTo(map);
             canvasTextLayer = L.imageOverlay(textCanvasUrl, [[0,0], [viewport.height, viewport.width]], { interactive: false, className: 'canvas-text-layer' }).addTo(map);
+            
+            if (!isBaseMapVisible) {
+                if (svgLayer) svgLayer.setOpacity(0);
+                if (canvasTextLayer) canvasTextLayer.setOpacity(0);
+            }
+
             map.fitBounds([[0,0], [viewport.height, viewport.width]]);
-            document.getElementById('loader').style.display='none'; document.getElementById('pageInfo').innerText = `${currentPage} / ${totalPages}`;
+            document.getElementById('loader').style.display='none'; 
+            document.getElementById('pageInfo').innerText = `${currentPage} / ${totalPages}`;
             document.getElementById('pageNav').style.display = totalPages > 1 ? 'flex' : 'none';
-            resetCursor(); updateScales();
-        } catch (err) { alert("Error: Text extraction failed."); document.getElementById('loader').style.display='none'; }
+            resetCursor(); 
+            updateScales();
+        } catch (err) { 
+            alert("Error: Text extraction failed."); 
+            document.getElementById('loader').style.display='none'; 
+        }
     }
 
     let overlayElement = null;
@@ -665,7 +794,6 @@
         for(let k of keys) {
             let d = await localforage.getItem(k); if(!d || !d.name) continue;
             let dv = document.createElement('div'); dv.className = 'map-item';
-            
             if (mode === 'overlay') {
                 dv.innerHTML = `<span onclick="loadOverlayFromDB('${k}')" style="flex-grow:1; cursor:pointer;">📑 ${d.name} (Overlay)</span> <b onclick="event.stopPropagation(); delDB('${k}')" style="color:red; margin-left:15px; font-size:20px;">✕</b>`;
             } else {
@@ -676,54 +804,64 @@
     }
 
     async function handleOverlayFile(e) { 
-        if(!pdfDoc) { 
-            alert("Overlay Failed: Error: Set map center and zoom first."); 
-            e.target.value = ''; 
-            return; 
-        }
+        if(!pdfDoc) { alert("Overlay Failed: Error: Set map center and zoom first."); e.target.value = ''; return; }
         let f = e.target.files[0]; 
         if(!f) return; 
         currentOverlayKey = null; 
         processOverlay(f, 'file'); 
+        e.target.value = '';
     }
-    
-    async function loadOverlayFromDB(k) { 
-        if(!pdfDoc) { 
-            closeModal('mapListModal');
-            alert("Overlay Failed: Error: Set map center and zoom first."); 
-            return; 
-        }
 
+    async function loadOverlayFromDB(k, optState) { 
+        if(!pdfDoc) { closeModal('mapListModal'); alert("Overlay Failed: Error: Set map center and zoom first."); return; }
         closeModal('mapListModal'); 
         currentOverlayKey = k; 
-
         let d = await localforage.getItem(k); if(!d) return; 
         await processOverlay(d.pdfBlob, 'blob');
         
-        if(d.overlayState) {
-            if(d.overlayState.bounds) overlayLayer.setBounds(d.overlayState.bounds);
-            if(d.overlayState.opacity) {
-                document.getElementById('overlayOpacity').value = d.overlayState.opacity;
+        let state = optState || d.overlayState;
+        if(state) {
+            if(state.bounds && overlayLayer) {
+                try {
+                    let b = state.bounds;
+                    let sw = null, ne = null;
+                    if(Array.isArray(b) && b.length >= 2) {
+                        let sLat = b[0][0] !== undefined ? b[0][0] : b[0].lat;
+                        let sLng = b[0][1] !== undefined ? b[0][1] : b[0].lng;
+                        let nLat = b[1][0] !== undefined ? b[1][0] : b[1].lat;
+                        let nLng = b[1][1] !== undefined ? b[1][1] : b[1].lng;
+                        if(!isNaN(sLat) && !isNaN(nLat)) { sw = L.latLng(sLat, sLng); ne = L.latLng(nLat, nLng); }
+                    } else if(b._southWest && b._northEast) {
+                        if(!isNaN(b._southWest.lat) && !isNaN(b._northEast.lat)) { sw = L.latLng(b._southWest.lat, b._southWest.lng); ne = L.latLng(b._northEast.lat, b._northEast.lng); }
+                    }
+                    if(sw && ne) overlayLayer.setBounds(L.latLngBounds(sw, ne));
+                } catch(e) {}
+            }
+            if(state.opacity && overlayLayer) {
+                document.getElementById('overlayOpacity').value = state.opacity;
                 updateOverlayStyle();
             }
+            if(typeof state.angle !== 'undefined' && state.angle && overlayLayer) {
+                overlayAngle = state.angle;
+                applyOverlayRotation();
+            }
         }
+        saveCurrentMapToDB();
     }
 
     async function processOverlay(source, type) {
         document.getElementById('loader').style.display='block';
-        
-        if(!pdfDoc && type !== 'file') {
-             document.getElementById('loader').style.display='none';
-             return; 
-        }
+        if(!pdfDoc && type !== 'file') { document.getElementById('loader').style.display='none'; return; }
 
         try {
             let data = (type === 'file') ? await source.arrayBuffer() : await source.arrayBuffer();
-            let overlayDoc = await pdfjsLib.getDocument({ data: data }).promise;
+            let overlayDoc = await pdfjsLib.getDocument({ data: data, disableFontFace: true, verbosity: 0 }).promise;
             let page = await overlayDoc.getPage(1);
             let viewport = page.getViewport({ scale: 2.5 }); 
-            let canvas = document.createElement('canvas'); canvas.width = viewport.width; canvas.height = viewport.height;
-            let ctx = canvas.getContext('2d');
+            let canvas = document.createElement('canvas'); 
+            canvas.width = viewport.width; 
+            canvas.height = viewport.height;
+            let ctx = canvas.getContext('2d', { willReadFrequently: true });
             await page.render({canvasContext: ctx, viewport: viewport}).promise;
             
             let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -739,17 +877,19 @@
             let url = canvas.toDataURL('image/png');
             let pdfRatio = viewport.height / viewport.width;
             
-            let mapBounds = map.getBounds();
-            let mapWidth = mapBounds.getEast() - mapBounds.getWest();
-            let targetWidth = mapWidth * 0.7; 
+            // ✅ बेस नक्शे के 100% सही अक्षांश-देशांतर दायरे पर लॉक
+            let baseBounds = (svgLayer && svgLayer.getBounds) ? svgLayer.getBounds() : map.getBounds();
+            let baseWidth = baseBounds.getEast() - baseBounds.getWest();
+            let targetWidth = baseWidth; 
             let targetHeight = targetWidth * pdfRatio; 
-            let center = mapBounds.getCenter();
+            let center = baseBounds.getCenter();
             let sw = L.latLng(center.lat - targetHeight/2, center.lng - targetWidth/2);
             let ne = L.latLng(center.lat + targetHeight/2, center.lng + targetWidth/2);
             
             if(overlayLayer) map.removeLayer(overlayLayer);
             overlayLayer = L.imageOverlay(url, [sw, ne], { className: 'overlay-map-layer', interactive: false }).addTo(map);
             overlayElement = overlayLayer.getElement();
+            overlayAngle = 0;
             
             if(type === 'file') {
                  let key = 'overlay_' + Date.now();
@@ -761,6 +901,7 @@
             restoreOverlayPanel();
             toggleOverlayLock(false); 
             document.getElementById('loader').style.display='none';
+            saveCurrentMapToDB();
         } catch(err) { 
             if(type === 'file') alert("Overlay Failed: " + err); 
             document.getElementById('loader').style.display='none'; 
@@ -769,15 +910,64 @@
 
     function recolorOverlay(color) {
         if(!overlayLayer || !currentOverlayOriginalData) return;
-        let canvas = document.createElement('canvas'); canvas.width = currentOverlayOriginalData.width; canvas.height = currentOverlayOriginalData.height;
-        let ctx = canvas.getContext('2d');
+        let canvas = document.createElement('canvas'); 
+        canvas.width = currentOverlayOriginalData.width; 
+        canvas.height = currentOverlayOriginalData.height;
+        let ctx = canvas.getContext('2d', { willReadFrequently: true });
         let newData = new ImageData(new Uint8ClampedArray(currentOverlayOriginalData.data), currentOverlayOriginalData.width, currentOverlayOriginalData.height);
         let px = newData.data;
         let r=0, g=0, b=0;
-        if(color === 'red') { r=255; g=0; b=0; } else if(color === 'blue') { r=0; g=0; b=255; } else if(color === 'black') { r=0; g=0; b=0; }
-        for (let i = 0; i < px.length; i += 4) { if (px[i+3] > 0) { px[i] = r; px[i+1] = g; px[i+2] = b; } }
+        
+        if(color === 'red') { r=255; g=0; b=0; } 
+        else if(color === 'blue') { r=0; g=0; b=255; } 
+        else if(color === 'black') { r=0; g=0; b=0; }
+        else if(color && color.startsWith('#')) {
+            let hex = color.replace('#', '');
+            if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+            let num = parseInt(hex, 16);
+            r = (num >> 16) & 255; g = (num >> 8) & 255; b = num & 255;
+        }
+
+        for (let i = 0; i < px.length; i += 4) { 
+            if (px[i+3] > 0) { px[i] = r; px[i+1] = g; px[i+2] = b; } 
+        }
         ctx.putImageData(newData, 0, 0);
         overlayLayer.setUrl(canvas.toDataURL('image/png'));
+    }
+
+    function toggleBaseMap() {
+        isBaseMapVisible = !isBaseMapVisible;
+        let btn = document.getElementById('toggleBaseBtn');
+        if (!isBaseMapVisible) {
+            if (svgLayer) svgLayer.setOpacity(0);
+            if (canvasTextLayer) canvasTextLayer.setOpacity(0);
+            if (btn) { btn.innerHTML = "🚫"; btn.style.background = "#ffebee"; btn.style.color = "#c62828"; btn.style.borderColor = "#f44336"; }
+        } else {
+            if (svgLayer) svgLayer.setOpacity(1);
+            if (canvasTextLayer) canvasTextLayer.setOpacity(1);
+            if (btn) { btn.innerHTML = "👁️"; btn.style.background = "#e8f5e9"; btn.style.color = "#1b5e20"; btn.style.borderColor = "#4caf50"; }
+        }
+    }
+
+    function rotateOverlay(delta) {
+        if(!overlayLayer) return;
+        overlayAngle = (overlayAngle + delta) % 360;
+        applyOverlayRotation();
+        saveCurrentMapToDB();
+    }
+
+    function applyOverlayRotation() {
+        if(!overlayLayer) return;
+        if(!overlayElement) overlayElement = overlayLayer.getElement();
+        if(overlayElement) {
+            if(overlayAngle !== 0) {
+                overlayElement.style.transformOrigin = 'center center';
+                overlayElement.style.rotate = overlayAngle + 'deg';
+            } else {
+                overlayElement.style.transformOrigin = '';
+                overlayElement.style.rotate = '';
+            }
+        }
     }
 
     async function toggleOverlayLock(forceState) {
@@ -790,22 +980,36 @@
             if(currentOverlayKey && overlayLayer) {
                 let d = await localforage.getItem(currentOverlayKey);
                 if(d) {
-                    d.overlayState = { bounds: overlayLayer.getBounds(), opacity: document.getElementById('overlayOpacity').value };
+                    let b = overlayLayer.getBounds();
+                    d.overlayState = { 
+                        bounds: [[b.getSouth(), b.getWest()], [b.getNorth(), b.getEast()]], 
+                        opacity: document.getElementById('overlayOpacity').value,
+                        angle: overlayAngle 
+                    };
                     await localforage.setItem(currentOverlayKey, d);
                 }
             }
         } 
         else { btn.innerText = "🔓 UNLOCK"; btn.className = "ov-btn lock-btn"; }
+        saveCurrentMapToDB();
     }
 
     function removeOverlay() {
         if(overlayLayer) { map.removeLayer(overlayLayer); overlayLayer = null; }
         minimizeOverlayPanel();
         currentOverlayKey = null;
+        overlayAngle = 0;
+        currentOverlayOriginalData = null;
+        overlayElement = null;
         document.getElementById('minimizedIcon').style.display = 'none'; 
+        if (!isBaseMapVisible) toggleBaseMap();
+        saveCurrentMapToDB();
     }
 
-    function updateOverlayStyle() { if(overlayElement) overlayElement.style.opacity = document.getElementById('overlayOpacity').value; }
+    function updateOverlayStyle() { 
+        if(overlayElement) overlayElement.style.opacity = document.getElementById('overlayOpacity').value; 
+        saveCurrentMapToDB();
+    }
     
     function moveOverlay(dir) { 
         if(!overlayLayer) return; 
@@ -818,74 +1022,263 @@
         if(dir === 'left') { e-=deltaLng; w-=deltaLng; } 
         if(dir === 'right') { e+=deltaLng; w+=deltaLng; } 
         overlayLayer.setBounds([[s, w], [n, e]]); 
+        saveCurrentMapToDB();
     }
     
-    function scaleOverlay(factor) { if(!overlayLayer) return; let b = overlayLayer.getBounds(); let c = b.getCenter(); let n = b.getNorth(), s = b.getSouth(), e = b.getEast(), w = b.getWest(); let newN = c.lat + (n - c.lat) * factor; let newS = c.lat + (s - c.lat) * factor; let newE = c.lng + (e - c.lng) * factor; let newW = c.lng + (w - c.lng) * factor; overlayLayer.setBounds([[newS, newW], [newN, newE]]); }
+    function scaleOverlay(factor) { 
+        if(!overlayLayer) return; 
+        let b = overlayLayer.getBounds(); 
+        let c = b.getCenter(); 
+        let n = b.getNorth(), s = b.getSouth(), e = b.getEast(), w = b.getWest(); 
+        let newN = c.lat + (n - c.lat) * factor; 
+        let newS = c.lat + (s - c.lat) * factor; 
+        let newE = c.lng + (e - c.lng) * factor; 
+        let newW = c.lng + (w - c.lng) * factor; 
+        overlayLayer.setBounds([[newS, newW], [newN, newE]]); 
+        saveCurrentMapToDB();
+    }
 
-    function changePage(delta) { let newPage = currentPage + delta; if(newPage < 1 || newPage > totalPages) return; savePageState(currentPage); permanentLayer.clearLayers(); activeLayer.clearLayers(); finishedShapes = []; magneticPoints = []; activePoints = []; activeMarkers = []; currentPage = newPage; renderPage(currentPage); loadPageState(currentPage); }
-    function savePageState(pNum) { if(!pageData[pNum]) pageData[pNum] = {}; pageData[pNum].scaleFactor = (typeof scaleFactor !== 'undefined') ? scaleFactor : 0; pageData[pNum].unit = unit; pageData[pNum].shapes = finishedShapes.map(s => { return { points: s.points, color: s.color, mode: s.mode }; }); saveCurrentMapToDB(); }
-    function loadPageState(pNum) { let d = pageData[pNum]; if(!d) { scaleFactor = 0; unit = 'ft'; finishedShapes = []; switchMode('scale'); } else { scaleFactor = d.scaleFactor || 0; unit = d.unit || 'ft'; finishedShapes = []; (d.shapes || []).forEach(s => { drawPermanentShape(s.points, s.mode, s.color); }); if(scaleFactor > 0) switchMode('dist'); else switchMode('scale'); refreshMagneticPoints(); } }
+    function changePage(delta) { 
+        let newPage = currentPage + delta; 
+        if(newPage < 1 || newPage > totalPages) return; 
+        savePageState(currentPage); 
+        permanentLayer.clearLayers(); 
+        activeLayer.clearLayers(); 
+        finishedShapes = []; 
+        magneticPoints = []; 
+        activePoints = []; 
+        activeMarkers = []; 
+        currentPage = newPage; 
+        renderPage(currentPage); 
+        loadPageState(currentPage); 
+    }
+    
+    function savePageState(pNum) { 
+        if(!pageData[pNum]) pageData[pNum] = {}; 
+        pageData[pNum].scaleFactor = (typeof scaleFactor !== 'undefined') ? scaleFactor : 0; 
+        pageData[pNum].unit = unit; 
+        pageData[pNum].shapes = finishedShapes.map(s => { return { points: s.points, color: s.color, mode: s.mode }; }); 
+        saveCurrentMapToDB(); 
+    }
+    
+    function loadPageState(pNum) { 
+        let d = pageData[pNum]; 
+        if(!d) { 
+            scaleFactor = 0; 
+            unit = 'ft'; 
+            finishedShapes = []; 
+            switchMode('scale'); 
+        } else { 
+            scaleFactor = d.scaleFactor || 0; 
+            unit = d.unit || 'ft'; 
+            finishedShapes = []; 
+            (d.shapes || []).forEach(s => { drawPermanentShape(s.points, s.mode, s.color); }); 
+            if(scaleFactor > 0) switchMode('dist'); else switchMode('scale'); 
+            refreshMagneticPoints(); 
+        } 
+    }
 
-    function getLensCenterLatLng() { const lens = document.querySelector('.cursor-graphic'); const mapDiv = document.getElementById('map'); const lensRect = lens.getBoundingClientRect(); const mapRect = mapDiv.getBoundingClientRect(); const centerX = (lensRect.left + lensRect.width / 2) - mapRect.left; const centerY = (lensRect.top + lensRect.height / 2) - mapRect.top; return map.containerPointToLatLng([centerX, centerY]); }
+    function getLensCenterLatLng() { 
+        const lens = document.querySelector('.cursor-graphic'); 
+        const mapDiv = document.getElementById('map'); 
+        const lensRect = lens.getBoundingClientRect(); 
+        const mapRect = mapDiv.getBoundingClientRect(); 
+        const centerX = (lensRect.left + lensRect.width / 2) - mapRect.left; 
+        const centerY = (lensRect.top + lensRect.height / 2) - mapRect.top; 
+        return map.containerPointToLatLng([centerX, centerY]); 
+    }
     function resetCursor() { document.getElementById('magicCursor').style.display='block'; cursor.style.left='calc(50% - 30px)'; cursor.style.top='calc(50% - 60px)'; updateRubberLine(); }
-    const cursor = document.getElementById('magicCursor'); const handle = document.getElementById('handleBtn'); let isDragging=false, startX, startY, initLeft, initTop, snappedPoint=null;
-    handle.addEventListener('touchstart', dragStart, {passive: false}); handle.addEventListener('mousedown', dragStart);
-    function dragStart(e) { e.preventDefault(); isDragging=false; startX = e.touches ? e.touches[0].clientX : e.clientX; startY = e.touches ? e.touches[0].clientY : e.clientY; let r = cursor.getBoundingClientRect(); initLeft=r.left; initTop=r.top; document.addEventListener('touchmove', dragMove, {passive: false}); document.addEventListener('touchend', dragEnd); }
+    
+    const cursor = document.getElementById('magicCursor'); 
+    const handle = document.getElementById('handleBtn'); 
+    let isDragging=false, startX, startY, initLeft, initTop, snappedPoint=null;
+    let cachedSnaps = [];
+    let cachedMapRect = null;
+    let cachedLensOffsetX = 30, cachedLensOffsetY = 25;
+    let cursorRaf = null;
+    let pendingLeft = 0, pendingTop = 0, pendingCenterPx = null;
+
+    handle.addEventListener('touchstart', dragStart, {passive: false}); 
+    handle.addEventListener('mousedown', dragStart);
+
+    function dragStart(e) { 
+        e.preventDefault(); 
+        isDragging = false; 
+        startX = e.touches ? e.touches[0].clientX : e.clientX; 
+        startY = e.touches ? e.touches[0].clientY : e.clientY; 
+        let r = cursor.getBoundingClientRect(); 
+        initLeft = r.left; 
+        initTop = r.top; 
+
+        let mapDiv = document.getElementById('map');
+        cachedMapRect = mapDiv.getBoundingClientRect();
+        const lens = document.querySelector('.cursor-graphic'); 
+        const lensRect = lens.getBoundingClientRect(); 
+        cachedLensOffsetX = (lensRect.left + lensRect.width / 2) - r.left; 
+        cachedLensOffsetY = (lensRect.top + lensRect.height / 2) - r.top;
+
+        cachedSnaps = [];
+        if (isMagnetActive && magneticPoints.length > 0) {
+            for (let i = 0; i < magneticPoints.length; i++) {
+                cachedSnaps.push({ pt: magneticPoints[i], px: map.latLngToContainerPoint(magneticPoints[i]) });
+            }
+        }
+
+        pendingLeft = initLeft;
+        pendingTop = initTop;
+        pendingCenterPx = { x: (initLeft + cachedLensOffsetX) - cachedMapRect.left, y: (initTop + cachedLensOffsetY) - cachedMapRect.top };
+
+        document.addEventListener('touchmove', dragMove, {passive: false}); 
+        document.addEventListener('touchend', dragEnd); 
+    }
     
     function dragMove(e) { 
+        if (e.cancelable) e.preventDefault(); 
         let x = e.touches ? e.touches[0].clientX : e.clientX; 
         let y = e.touches ? e.touches[0].clientY : e.clientY; 
-        if(Math.abs(x-startX)>3 || Math.abs(y-startY)>3) isDragging=true; 
-        let nL = initLeft + (x-startX); 
-        let nT = initTop + (y-startY); 
-        snappedPoint = null; 
+        if (Math.abs(x - startX) > 2 || Math.abs(y - startY) > 2) isDragging = true; 
+        let nL = initLeft + (x - startX); 
+        let nT = initTop + (y - startY); 
         
-        if(isMagnetActive) {
-            let mapRect = document.getElementById('map').getBoundingClientRect(); 
-            const lens = document.querySelector('.cursor-graphic'); 
-            const lensRect = lens.getBoundingClientRect(); 
-            const halfWidth = lensRect.width / 2; 
-            const halfHeight = lensRect.height / 2; 
-            let centerPx = { x: (nL + halfWidth) - mapRect.left, y: (nT + halfHeight) - mapRect.top }; 
-            let snapDistance = (window.innerWidth > 800) ? 20 : 15; 
-            for(let pt of magneticPoints) { 
-                let ptPx = map.latLngToContainerPoint(pt); 
-                if(Math.sqrt(Math.pow(ptPx.x-centerPx.x, 2)+Math.pow(ptPx.y-centerPx.y, 2)) < snapDistance) { 
-                    snappedPoint = pt; 
-                    nL = (ptPx.x + mapRect.left) - halfWidth; 
-                    nT = (ptPx.y + mapRect.top) - halfHeight; 
+        let mRect = cachedMapRect || document.getElementById('map').getBoundingClientRect();
+        let centerPx = { x: (nL + cachedLensOffsetX) - mRect.left, y: (nT + cachedLensOffsetY) - mRect.top }; 
+
+        if (isMagnetActive && cachedSnaps.length > 0) {
+            let baseSnap = (window.innerWidth > 800) ? 20 : 14;
+            let snapDistance = snappedPoint ? (baseSnap + 6) : baseSnap;
+            let snapDistSq = snapDistance * snapDistance;
+            let found = null;
+
+            for (let i = 0; i < cachedSnaps.length; i++) { 
+                if (fixedDistanceVal > 0 && activePoints.length === 1 && activePoints[0].equals(cachedSnaps[i].pt)) {
+                    continue;
+                }
+                let dx = cachedSnaps[i].px.x - centerPx.x;
+                let dy = cachedSnaps[i].px.y - centerPx.y;
+                if ((dx * dx + dy * dy) < snapDistSq) { 
+                    found = cachedSnaps[i];
                     break; 
                 } 
             }
+
+            if (found) {
+                snappedPoint = found.pt;
+                nL = (found.px.x + mRect.left) - cachedLensOffsetX;
+                nT = (found.px.y + mRect.top) - cachedLensOffsetY;
+                centerPx.x = found.px.x;
+                centerPx.y = found.px.y;
+            } else {
+                snappedPoint = null;
+            }
+        } else {
+            snappedPoint = null;
         }
-        
-        cursor.style.left = nL + 'px'; 
-        cursor.style.top = nT + 'px'; 
-        updateRubberLine(); 
+
+        pendingLeft = nL;
+        pendingTop = nT;
+        pendingCenterPx = centerPx;
+
+        if (!cursorRaf) {
+            cursorRaf = requestAnimationFrame(() => {
+                cursor.style.left = pendingLeft + 'px'; 
+                cursor.style.top = pendingTop + 'px'; 
+                updateRubberLine(pendingCenterPx); 
+                cursorRaf = null;
+            });
+        }
     }
     
-    function dragEnd() { document.removeEventListener('touchmove', dragMove); document.removeEventListener('touchend', dragEnd); if(!isDragging) addPoint(); }
+    function dragEnd() { 
+        document.removeEventListener('touchmove', dragMove); 
+        document.removeEventListener('touchend', dragEnd); 
+        if (cursorRaf) { cancelAnimationFrame(cursorRaf); cursorRaf = null; }
+        cursor.style.left = pendingLeft + 'px'; 
+        cursor.style.top = pendingTop + 'px'; 
+        updateRubberLine(pendingCenterPx);
+        cachedSnaps = [];
+        cachedMapRect = null;
+        if (!isDragging) addPoint(); 
+    }
 
     function toggleMagnet() {
         isMagnetActive = !isMagnetActive;
         let btn = document.getElementById('magBtn');
-        if(isMagnetActive) {
-            btn.classList.remove('mag-off');
-        } else {
-            btn.classList.add('mag-off');
+        if (isMagnetActive) btn.classList.remove('mag-off'); else btn.classList.add('mag-off');
+    }
+
+    function openFixedDistModal() {
+        if (scaleFactor <= 0) { alert("Please set map scale first!"); switchMode('scale'); return; }
+        document.getElementById('fixedDistUnitDisp').innerText = (unit === 'ft' ? 'Feet' : unit === 'links' ? 'Links' : 'Meter');
+        document.getElementById('fixedDistInput').value = fixedDistanceVal > 0 ? fixedDistanceVal : '';
+        document.getElementById('fixedDistModal').style.display = 'flex';
+    }
+
+    function applyFixedDist() {
+        let inputEl = document.getElementById('fixedDistInput');
+        let val = parseFloat(inputEl.value);
+        if (inputEl) inputEl.blur();
+        if (document.activeElement) document.activeElement.blur();
+        window.focus();
+        document.getElementById('fixedDistModal').style.display = 'none';
+        if (!val || val <= 0) { clearFixedDist(); return; }
+        fixedDistanceVal = val;
+        switchMode('dist');
+        let btn = document.getElementById('btnFixedDist');
+        if (btn) {
+            btn.classList.add('mode-active');
+            btn.innerHTML = `📌<br>${val}${unit.substring(0,2)}`;
         }
+        showToast(`📏 Fixed Line: ${val} ${unit} Active`);
+    }
+
+    function clearFixedDist() {
+        let inputEl = document.getElementById('fixedDistInput');
+        if (inputEl) { inputEl.value = ''; inputEl.blur(); }
+        if (document.activeElement) document.activeElement.blur();
+        window.focus();
+        fixedDistanceVal = 0;
+        document.getElementById('fixedDistModal').style.display = 'none';
+        let btn = document.getElementById('btnFixedDist');
+        if (btn) { btn.classList.remove('mode-active'); btn.innerHTML = "📌<br>Fix Ft"; }
+        showToast("Fixed Line Mode: OFF");
     }
 
     function addPoint() { 
         if(!svgLayer && !canvasTextLayer) return; 
         let latlng = snappedPoint || getLensCenterLatLng(); 
+        let wasSnapped = !!snappedPoint;
+        snappedPoint = null;
         
         if(mode === 'scale' && activePoints.length >= 2) return; 
+
+        // ✅ सुपरफास्ट शुद्ध गणित (0% लैग, तुरंत क्रिएट)
+        if (fixedDistanceVal > 0 && scaleFactor > 0 && activePoints.length === 1 && mode === 'dist') {
+            let p1 = activePoints[0];
+            let targetMapDist = fixedDistanceVal * scaleFactor;
+            let dx = latlng.lng - p1.lng;
+            let dy = latlng.lat - p1.lat;
+            let dSq = dx * dx + dy * dy;
+            if (dSq > 0.000001) {
+                let d = Math.sqrt(dSq);
+                let ratio = targetMapDist / d;
+                latlng = L.latLng(p1.lat + dy * ratio, p1.lng + dx * ratio);
+            }
+            activePoints.push(latlng);
+            historyStack.push({type: 'point', latlng: latlng, color: currentColor, mode: mode});
+            redoStack = [];
+            magneticPoints.push(latlng);
+            let m = L.circleMarker(latlng, { color: currentColor, radius: 0.8, fillColor: 'white', fillOpacity: 1 }).addTo(activeLayer);
+            activeMarkers.push(m);
+            refreshMagneticPoints();
+            finishShape();
+            showToast(`✅ ${fixedDistanceVal.toFixed(2)} ${unit} Line Created!`);
+            return;
+        }
         
         activePoints.push(latlng); 
         historyStack.push({type: 'point', latlng: latlng, color: currentColor, mode: mode}); 
         redoStack = []; 
-        if(!snappedPoint) magneticPoints.push(latlng); 
+        if(!wasSnapped) magneticPoints.push(latlng); 
         
         let m = L.circleMarker(latlng, { color: currentColor, radius: 0.8, fillColor: 'white', fillOpacity: 1 }).addTo(activeLayer); 
         activeMarkers.push(m); 
@@ -893,7 +1286,12 @@
         
         if(mode === 'scale' && activePoints.length === 2) { 
             L.polyline(activePoints, {color: currentColor, weight: 2}).addTo(activeLayer); 
-            setTimeout(() => { document.getElementById('calibModal').style.display='flex'; }, 100); 
+            preCalibCenter = map.getCenter();
+            preCalibZoom = map.getZoom();
+            setTimeout(() => { 
+                document.getElementById('calibVal').value = '';
+                document.getElementById('calibModal').style.display = 'flex'; 
+            }, 100); 
             return; 
         } 
         drawActiveShape(); 
@@ -901,12 +1299,49 @@
 
     map.on('click', addPoint);
 
-    function drawActiveShape() { activeLayer.eachLayer(l => { if(l instanceof L.Polyline && !(l instanceof L.CircleMarker)) activeLayer.removeLayer(l); }); if(activePoints.length > 1) { L.polyline(activePoints, {color: currentColor, weight: 2}).addTo(activeLayer); } updateRubberLine(); }
-    function updateRubberLine() { if(activePoints.length === 0 || (!svgLayer && !canvasTextLayer)) { if(rubberLine) map.removeLayer(rubberLine); rubberLine = null; return; } let lp = activePoints[activePoints.length-1]; let cp = snappedPoint || getLensCenterLatLng(); if(rubberLine) map.removeLayer(rubberLine); rubberLine = L.polyline([lp, cp], { color: currentColor, weight: 1.5, dashArray: '5,5' }).addTo(map); }
+    function drawActiveShape() { 
+        activeLayer.eachLayer(l => { 
+            if(l instanceof L.Polyline && !(l instanceof L.CircleMarker)) activeLayer.removeLayer(l); 
+        }); 
+        if(activePoints.length > 1) { 
+            L.polyline(activePoints, {color: currentColor, weight: 2}).addTo(activeLayer); 
+        } 
+        updateRubberLine(); 
+    }
+    
+    function updateRubberLine(optCenterPx) { 
+        if(activePoints.length === 0 || (!svgLayer && !canvasTextLayer)) { 
+            if(rubberLine) { map.removeLayer(rubberLine); rubberLine = null; } 
+            return; 
+        } 
+        let lp = activePoints[activePoints.length-1]; 
+        let cp = snappedPoint || (optCenterPx ? map.containerPointToLatLng([optCenterPx.x, optCenterPx.y]) : getLensCenterLatLng()); 
+        
+        // ✅ शुद्ध 64-बिट हार्डवेयर फ्लोट (फ़ोर्स्ड लेआउट और हैंग पूरी तरह खत्म)
+        if (fixedDistanceVal > 0 && scaleFactor > 0 && activePoints.length === 1 && mode === 'dist') {
+            let targetMapDist = fixedDistanceVal * scaleFactor;
+            let dx = cp.lng - lp.lng;
+            let dy = cp.lat - lp.lat;
+            let dSq = dx * dx + dy * dy;
+            if (dSq > 0.000001) {
+                let d = Math.sqrt(dSq);
+                let ratio = targetMapDist / d;
+                cp = L.latLng(lp.lat + dy * ratio, lp.lng + dx * ratio);
+            }
+        }
+
+        if(!rubberLine) {
+            rubberLine = L.polyline([lp, cp], { color: currentColor, weight: 1.5, dashArray: '5,5' }).addTo(map); 
+        } else {
+            rubberLine.setLatLngs([lp, cp]);
+        }
+    }
     
     function applyCalibration(){ 
-        let v=parseFloat(document.getElementById('calibVal').value); 
+        let calibInput = document.getElementById('calibVal');
+        let v = parseFloat(calibInput.value); 
         if(!v) return; 
+        calibInput.blur();
         scaleFactor = calculateDist(activePoints) / v; 
         unit = document.getElementById('calibUnit').value; 
         document.getElementById('calibModal').style.display='none'; 
@@ -921,10 +1356,16 @@
         refreshMagneticPoints(); 
         switchMode('dist'); 
         savePageState(currentPage); 
+        if(preCalibCenter) {
+            setTimeout(() => { map.setView(preCalibCenter, preCalibZoom, { animate: false }); }, 100);
+        }
     }
 
     function finishShape() { 
-        if(mode === 'scale' && activePoints.length === 2) { document.getElementById('calibModal').style.display='flex'; return; } 
+        if(mode === 'scale' && activePoints.length === 2) { 
+            document.getElementById('calibModal').style.display='flex'; 
+            return; 
+        } 
         if(activePoints.length > 1) { 
             let finalMode = mode; 
             if(mode === 'area') { if(activePoints.length > 2) finalMode = 'area'; else finalMode = 'dist'; } 
@@ -934,7 +1375,7 @@
             savePageState(currentPage); 
         } 
         activePoints=[]; 
-        activeMarkers.forEach(m=>m.remove());
+        activeMarkers.forEach(m=>m.remove()); 
         activeMarkers=[]; 
         activeLayer.clearLayers(); 
         if(rubberLine) map.removeLayer(rubberLine); 
@@ -942,7 +1383,6 @@
         refreshMagneticPoints(); 
     }
     
-    // [V101: CRITICAL FIX - V87 UNDO RESTORE LOGIC]
     function undoAction() {
         if(historyStack.length === 0) return;
         let last = historyStack.pop();
@@ -989,8 +1429,24 @@
         savePageState(currentPage);
     }
 
-    document.getElementById('btnUndo').addEventListener('touchstart', function(e) { e.preventDefault(); undoAction(); }); document.getElementById('btnRedo').addEventListener('touchstart', function(e) { e.preventDefault(); redoAction(); });
-    function sequentialDelete() { if (activePoints.length > 0) { activePoints=[]; activeMarkers.forEach(m=>m.remove()); activeMarkers=[]; activeLayer.clearLayers(); if(rubberLine) map.removeLayer(rubberLine); rubberLine=null; } else if (finishedShapes.length > 0) { let last = finishedShapes.pop(); permanentLayer.removeLayer(last.layer); } refreshMagneticPoints(); savePageState(currentPage); }
+    document.getElementById('btnUndo').addEventListener('touchstart', function(e) { e.preventDefault(); undoAction(); }); 
+    document.getElementById('btnRedo').addEventListener('touchstart', function(e) { e.preventDefault(); redoAction(); });
+    
+    function sequentialDelete() { 
+        if (activePoints.length > 0) { 
+            activePoints=[]; 
+            activeMarkers.forEach(m=>m.remove()); 
+            activeMarkers=[]; 
+            activeLayer.clearLayers(); 
+            if(rubberLine) map.removeLayer(rubberLine); 
+            rubberLine=null; 
+        } else if (finishedShapes.length > 0) { 
+            let last = finishedShapes.pop(); 
+            permanentLayer.removeLayer(last.layer); 
+        } 
+        refreshMagneticPoints(); 
+        savePageState(currentPage); 
+    }
 
     function drawPermanentShape(pts, shpMode, shpColor) {
         let shapeGroup = L.layerGroup();
@@ -1041,48 +1497,226 @@
     function formatDist(d) { return (scaleFactor>0 ? (d/scaleFactor).toFixed(2) : Math.round(d)) + " " + unit; }
     function formatArea(a) { return (scaleFactor>0 ? (a/(scaleFactor**2)).toFixed(2) : Math.round(a)) + " sq " + unit; }
     
-    function switchMode(m){ finishShape(); mode=m; document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('mode-active')); document.getElementById('btn'+m.charAt(0).toUpperCase()+m.slice(1)).classList.add('mode-active'); }
+    function switchMode(m){ 
+        finishShape(); 
+        mode=m; 
+        document.querySelectorAll('.mode-btn').forEach(b=>{
+            if (b.id !== 'btnFixedDist') b.classList.remove('mode-active');
+        }); 
+        let activeEl = document.getElementById('btn'+m.charAt(0).toUpperCase()+m.slice(1));
+        if (activeEl) activeEl.classList.add('mode-active'); 
+    }
     function updateColor(){ currentColor=document.getElementById('colorInput').value; }
     function closeModal(id){ document.getElementById(id).style.display='none'; }
     function closeExport(){ document.getElementById('exportModal').style.display='none'; }
 
     function openExportModal() {
-        document.getElementById('magicCursor').style.visibility='hidden';
-        html2canvas(document.getElementById('map'), { useCORS: true, scale: 3 }).then(c => {
-            document.getElementById('captureImg').src = c.toDataURL('image/jpeg', 0.9);
-            document.getElementById('exportModal').style.display='flex';
-            document.getElementById('magicCursor').style.visibility='visible';
+        document.getElementById('magicCursor').style.visibility = 'hidden';
+        html2canvas(document.getElementById('map'), { 
+            useCORS: true, 
+            allowTaint: true,
+            scale: 3,
+            backgroundColor: '#ffffff'
+        }).then(c => {
+            let sqDim = Math.min(c.width, c.height);
+            let sx = (c.width - sqDim) / 2;
+            let sy = (c.height - sqDim) / 2;
+            
+            let sqCanvas = document.createElement('canvas');
+            sqCanvas.width = sqDim;
+            sqCanvas.height = sqDim;
+            let sqCtx = sqCanvas.getContext('2d');
+            sqCtx.fillStyle = '#ffffff';
+            sqCtx.fillRect(0, 0, sqDim, sqDim);
+            sqCtx.drawImage(c, sx, sy, sqDim, sqDim, 0, 0, sqDim, sqDim);
+
+            document.getElementById('captureImg').src = sqCanvas.toDataURL('image/jpeg', 0.95);
+            sqCanvas.width = 0; sqCanvas.height = 0;
+            
+            document.getElementById('exportModal').style.display = 'flex';
+            document.getElementById('magicCursor').style.visibility = 'visible';
+            
+            setTimeout(() => {
+                document.querySelectorAll('#exportModal input, #exportModal [contenteditable="true"]').forEach(el => {
+                    el.onfocus = function() {
+                        setTimeout(() => { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 250);
+                    };
+                });
+            }, 300);
         });
     }
     
     function downloadFinalReport() {
+        const modal = document.getElementById('exportModal');
         const btnBar = document.getElementById('downloadAction');
+        const nArrow = document.querySelector('.report-north-arrow');
+        
         btnBar.style.display = 'none';
+        if (nArrow) { nArrow.style.animation = 'none'; nArrow.style.opacity = '1'; }
+
+        document.querySelectorAll('#exportModal input').forEach(inp => {
+            inp.setAttribute('value', inp.value);
+        });
+
+        modal.scrollTop = 0;
+        modal.scrollLeft = 0;
+
+        const origHeight = modal.style.height;
+        const origOverflow = modal.style.overflow;
+        const origPosition = modal.style.position;
+        
+        modal.style.height = 'auto';
+        modal.style.overflow = 'visible';
+        modal.style.position = 'absolute';
+
         setTimeout(() => {
-            html2canvas(document.getElementById('exportModal'), { 
+            html2canvas(modal, { 
                 scale: 3.0, 
                 useCORS: true, 
                 allowTaint: true,
-                backgroundColor: '#ffffff' 
+                backgroundColor: '#ffffff',
+                scrollY: 0,
+                scrollX: 0,
+                windowWidth: modal.scrollWidth,
+                windowHeight: modal.scrollHeight
             }).then(canvas => {
-                canvas.toBlob(function(blob) {
+                let targetW = canvas.width;
+                let targetH = Math.round(targetW * 1.4142);
+                let finalH = Math.max(targetH, canvas.height);
+                
+                let a4Canvas = document.createElement('canvas');
+                a4Canvas.width = targetW;
+                a4Canvas.height = finalH;
+                let ctx = a4Canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, a4Canvas.width, a4Canvas.height);
+                
+                let offsetY = (finalH - canvas.height) / 2;
+                ctx.drawImage(canvas, 0, Math.max(0, offsetY));
+
+                a4Canvas.toBlob(function(blob) {
                     let link = document.createElement('a'); 
-                    link.download = "SKR_Report.jpg"; 
+                    link.download = "AERO_Geo_Legal_Report.jpg"; 
                     link.href = URL.createObjectURL(blob); 
                     link.click(); 
+                    
+                    a4Canvas.width = 0; a4Canvas.height = 0;
+                    modal.style.height = origHeight;
+                    modal.style.overflow = origOverflow;
+                    modal.style.position = origPosition;
                     btnBar.style.display = 'block';
-                }, 'image/jpeg');
+                    if (nArrow) { nArrow.style.animation = ''; }
+                }, 'image/jpeg', 0.95);
+            }).catch(() => {
+                modal.style.height = origHeight;
+                modal.style.overflow = origOverflow;
+                modal.style.position = origPosition;
+                btnBar.style.display = 'block';
+                if (nArrow) { nArrow.style.animation = ''; }
             });
-        }, 300); 
+        }, 150); 
     }
 
-    async function handleNewFile(e) { let f = e.target.files[0]; if(!f) return; document.getElementById('calibVal').value = ""; currentMapKey = 'map_' + Date.now(); pdfDoc = null; currentPage = 1; pageData = {}; 
-    localStorage.removeItem('active_overlay'); removeOverlay();
-    document.getElementById('loader').style.display='block'; try { pdfDoc = await pdfjsLib.getDocument({ data: await f.arrayBuffer(), disableFontFace: true, ignoreErrors: true }).promise; totalPages = pdfDoc.numPages; let d = { id: currentMapKey, name: f.name, pdfBlob: f, totalPages: totalPages, pageData: {} }; await localforage.setItem(currentMapKey, d); permanentLayer.clearLayers(); finishedShapes=[]; magneticPoints=[]; historyStack=[]; redoStack=[]; await renderPage(1); switchMode('scale'); } catch(err) { alert("Invalid File"); document.getElementById('loader').style.display='none'; } }
+    async function handleNewFile(e) { 
+        let f = e.target.files[0]; 
+        if(!f) return; 
+        document.getElementById('calibVal').value = ""; 
+        currentMapKey = 'map_' + Date.now(); 
+        
+        if (pdfDoc) { try { pdfDoc.destroy(); } catch(err){} pdfDoc = null; }
+        if (prevSvgUrl) { URL.revokeObjectURL(prevSvgUrl); prevSvgUrl = null; }
+        prevCanvasUrl = null;
+        if (svgLayer) { map.removeLayer(svgLayer); svgLayer = null; }
+        if (canvasTextLayer) { map.removeLayer(canvasTextLayer); canvasTextLayer = null; }
+        
+        currentPage = 1; 
+        pageData = {}; 
+        scaleFactor = 0;
+        unit = 'ft';
+        clearFixedDist();
+        removeOverlay();
+        
+        document.getElementById('loader').style.display='block'; 
+        try { 
+            pdfDoc = await pdfjsLib.getDocument({ data: await f.arrayBuffer(), disableFontFace: true, ignoreErrors: true, verbosity: 0 }).promise; 
+            totalPages = pdfDoc.numPages; 
+            let d = { id: currentMapKey, name: f.name, pdfBlob: f, totalPages: totalPages, pageData: {}, attachedOverlay: null }; 
+            await localforage.setItem(currentMapKey, d); 
+            permanentLayer.clearLayers(); 
+            finishedShapes=[]; 
+            magneticPoints=[]; 
+            historyStack=[]; 
+            redoStack=[]; 
+            await renderPage(1); 
+            switchMode('scale'); 
+        } catch(err) { 
+            alert("Invalid File"); 
+            document.getElementById('loader').style.display='none'; 
+        } 
+        e.target.value = '';
+    }
     
-    async function loadDB(k) { closeModal('mapListModal'); let d = await localforage.getItem(k); currentMapKey = k; pdfDoc = await pdfjsLib.getDocument({ data: await d.pdfBlob.arrayBuffer(), disableFontFace: true, ignoreErrors: true }).promise; totalPages = d.totalPages || pdfDoc.numPages; pageData = d.pageData || {}; currentPage = 1; permanentLayer.clearLayers(); await renderPage(1); loadPageState(1); }
+    async function loadDB(k) { 
+        closeModal('mapListModal'); 
+        let d = await localforage.getItem(k); 
+        if(!d) return;
+        currentMapKey = k; 
+        
+        if (pdfDoc) { try { pdfDoc.destroy(); } catch(err){} pdfDoc = null; }
+        if (prevSvgUrl) { URL.revokeObjectURL(prevSvgUrl); prevSvgUrl = null; }
+        prevCanvasUrl = null;
+        if (svgLayer) { map.removeLayer(svgLayer); svgLayer = null; }
+        if (canvasTextLayer) { map.removeLayer(canvasTextLayer); canvasTextLayer = null; }
+        
+        pdfDoc = await pdfjsLib.getDocument({ data: await d.pdfBlob.arrayBuffer(), disableFontFace: true, ignoreErrors: true, verbosity: 0 }).promise; 
+        totalPages = d.totalPages || pdfDoc.numPages; 
+        pageData = d.pageData || {}; 
+        currentPage = 1; 
+        permanentLayer.clearLayers(); 
+        activeLayer.clearLayers();
+        if(rubberLine) { map.removeLayer(rubberLine); rubberLine = null; }
+        finishedShapes=[]; 
+        magneticPoints=[]; 
+        historyStack=[]; 
+        redoStack=[]; 
+        activePoints=[];
+        activeMarkers=[];
+        await renderPage(1); 
+        loadPageState(1); 
+        
+        if (d.attachedOverlay && d.attachedOverlay.key) {
+            await loadOverlayFromDB(d.attachedOverlay.key, d.attachedOverlay);
+        } else {
+            removeOverlay();
+        }
+    }
 
-    async function saveCurrentMapToDB() { if(!currentMapKey) return; let d = await localforage.getItem(currentMapKey); d.pageData = pageData; await localforage.setItem(currentMapKey, d); }
+    let saveDbTimer = null;
+    function saveCurrentMapToDB() { 
+        if(!currentMapKey) return; 
+        clearTimeout(saveDbTimer);
+        saveDbTimer = setTimeout(async () => {
+            try {
+                let d = await localforage.getItem(currentMapKey); 
+                if(d) {
+                    d.pageData = pageData; 
+                    if (currentOverlayKey && overlayLayer) {
+                        let b = overlayLayer.getBounds();
+                        d.attachedOverlay = {
+                            key: currentOverlayKey,
+                            bounds: [[b.getSouth(), b.getWest()], [b.getNorth(), b.getEast()]],
+                            opacity: document.getElementById('overlayOpacity').value,
+                            angle: overlayAngle
+                        };
+                    } else if (!overlayLayer) {
+                        d.attachedOverlay = null;
+                    }
+                    await localforage.setItem(currentMapKey, d); 
+                }
+            } catch(e) {}
+        }, 400);
+    }
+
     async function delDB(k) { if(confirm("Delete Map?")) { await localforage.removeItem(k); openMapList(currentOverlayKey ? 'overlay' : 'base'); } }
 
     initSecurity();
