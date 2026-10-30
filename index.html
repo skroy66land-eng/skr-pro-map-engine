@@ -687,7 +687,7 @@
     const ALL_INDIA_DIGIT_MAP = {
         '०':'0','१':'1','२':'2','३':'3','४':'4','५':'5','६':'6','७':'7','८':'8','९':'9',
         '০':'0','১':'1','२':'2','৩':'3','৪':'4','৫':'5','६':'6','৭':'7','৮':'8','৯':'9',
-        '۰':'0','۱':'1','२':'2','۳':'3','۴':'4','۵':'5','६':'6','۷':'7','۸':'8','۹':'9',
+        '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','६':'6','۷':'7','۸':'8','۹':'9',
         '٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9',
         '੦':'0','੧':'1','२':'2','੩':'3','੪':'4','੫':'5','੬':'6','੭':'7','੮':'8','੯':'9',
         '०':'0','૧':'1','२':'2','૩':'3','૪':'4','૫':'5','૬':'6','૭':'7','૮':'8','૯':'9',
@@ -877,12 +877,11 @@
             let url = canvas.toDataURL('image/png');
             let pdfRatio = viewport.height / viewport.width;
             
-            // ✅ बेस नक्शे के 100% सही अक्षांश-देशांतर दायरे पर लॉक
-            let baseBounds = (svgLayer && svgLayer.getBounds) ? svgLayer.getBounds() : map.getBounds();
-            let baseWidth = baseBounds.getEast() - baseBounds.getWest();
-            let targetWidth = baseWidth; 
+            let mapBounds = map.getBounds();
+            let mapWidth = mapBounds.getEast() - mapBounds.getWest();
+            let targetWidth = mapWidth * 0.7; 
             let targetHeight = targetWidth * pdfRatio; 
-            let center = baseBounds.getCenter();
+            let center = mapBounds.getCenter();
             let sw = L.latLng(center.lat - targetHeight/2, center.lng - targetWidth/2);
             let ne = L.latLng(center.lat + targetHeight/2, center.lng + targetWidth/2);
             
@@ -1216,12 +1215,10 @@
     function applyFixedDist() {
         let inputEl = document.getElementById('fixedDistInput');
         let val = parseFloat(inputEl.value);
-        if (inputEl) inputEl.blur();
-        if (document.activeElement) document.activeElement.blur();
-        window.focus();
-        document.getElementById('fixedDistModal').style.display = 'none';
+        inputEl.blur();
         if (!val || val <= 0) { clearFixedDist(); return; }
         fixedDistanceVal = val;
+        document.getElementById('fixedDistModal').style.display = 'none';
         switchMode('dist');
         let btn = document.getElementById('btnFixedDist');
         if (btn) {
@@ -1233,9 +1230,7 @@
 
     function clearFixedDist() {
         let inputEl = document.getElementById('fixedDistInput');
-        if (inputEl) { inputEl.value = ''; inputEl.blur(); }
-        if (document.activeElement) document.activeElement.blur();
-        window.focus();
+        inputEl.blur();
         fixedDistanceVal = 0;
         document.getElementById('fixedDistModal').style.display = 'none';
         let btn = document.getElementById('btnFixedDist');
@@ -1251,17 +1246,15 @@
         
         if(mode === 'scale' && activePoints.length >= 2) return; 
 
-        // ✅ सुपरफास्ट शुद्ध गणित (0% लैग, तुरंत क्रिएट)
         if (fixedDistanceVal > 0 && scaleFactor > 0 && activePoints.length === 1 && mode === 'dist') {
             let p1 = activePoints[0];
             let targetMapDist = fixedDistanceVal * scaleFactor;
-            let dx = latlng.lng - p1.lng;
-            let dy = latlng.lat - p1.lat;
-            let dSq = dx * dx + dy * dy;
-            if (dSq > 0.000001) {
-                let d = Math.sqrt(dSq);
+            let d = map.distance(p1, latlng);
+            if (d > 0) {
                 let ratio = targetMapDist / d;
-                latlng = L.latLng(p1.lat + dy * ratio, p1.lng + dx * ratio);
+                let fixedLat = p1.lat + (latlng.lat - p1.lat) * ratio;
+                let fixedLng = p1.lng + (latlng.lng - p1.lng) * ratio;
+                latlng = L.latLng(fixedLat, fixedLng);
             }
             activePoints.push(latlng);
             historyStack.push({type: 'point', latlng: latlng, color: currentColor, mode: mode});
@@ -1317,16 +1310,15 @@
         let lp = activePoints[activePoints.length-1]; 
         let cp = snappedPoint || (optCenterPx ? map.containerPointToLatLng([optCenterPx.x, optCenterPx.y]) : getLensCenterLatLng()); 
         
-        // ✅ शुद्ध 64-बिट हार्डवेयर फ्लोट (फ़ोर्स्ड लेआउट और हैंग पूरी तरह खत्म)
         if (fixedDistanceVal > 0 && scaleFactor > 0 && activePoints.length === 1 && mode === 'dist') {
             let targetMapDist = fixedDistanceVal * scaleFactor;
-            let dx = cp.lng - lp.lng;
-            let dy = cp.lat - lp.lat;
-            let dSq = dx * dx + dy * dy;
-            if (dSq > 0.000001) {
-                let d = Math.sqrt(dSq);
+            let d = map.distance(lp, cp);
+            let pxDist = map.latLngToContainerPoint(lp).distanceTo(map.latLngToContainerPoint(cp));
+            if (pxDist > 6 && d > 0) {
                 let ratio = targetMapDist / d;
-                cp = L.latLng(lp.lat + dy * ratio, lp.lng + dx * ratio);
+                cp = L.latLng(lp.lat + (cp.lat - lp.lat) * ratio, lp.lng + (cp.lng - lp.lng) * ratio);
+            } else {
+                cp = lp;
             }
         }
 
@@ -1375,7 +1367,7 @@
             savePageState(currentPage); 
         } 
         activePoints=[]; 
-        activeMarkers.forEach(m=>m.remove()); 
+        activeMarkers.forEach(m=>m.remove());
         activeMarkers=[]; 
         activeLayer.clearLayers(); 
         if(rubberLine) map.removeLayer(rubberLine); 
